@@ -1,4 +1,4 @@
-from openai import BaseModel
+from pydantic import BaseModel
 from src.models.vertex import Vertex
 
 class BoundingBox(BaseModel):
