@@ -1,5 +1,7 @@
 pydantic==2.10.4
 python-dotenv==1.0.1
 numpy==2.2.1
-opencv-contrib-python==4.10.0.84
 ultralytics==8.3.54
+opencv-contrib-python==4.10.0.84
+pydantic-settings==2.7.0
+matplotlib==3.10.0

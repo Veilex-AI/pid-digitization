@@ -1,16 +1,30 @@
+import math
 from typing import List
 import cv2
+from PIL import Image
+from PIL import ImageFile
 import numpy as np
-
+from shapely.geometry import Point
 from src.models.bounding_box import BoundingBox
 
 class LineDetectionService:
-    image_path: str
+    image_path: str = ""
     bounding_boxes: List[BoundingBox] = []
+    image_pil: ImageFile
+    line_padding: float = 15
+    line_thickness: float = 2
+    
 
-    def __init__(self, image_path, bounding_boxes):
+    def __init__(self, image_pil: ImageFile = None, image_path: str = "", bounding_boxes: List[BoundingBox] = []):
         self.image_path = image_path
         self.bounding_boxes = bounding_boxes
+        self.image_pil = image_pil
+
+    def get_image(self):
+        if not self.image_path:
+            return cv2.cvtColor(np.array(self.image_pil), cv2.COLOR_RGB2BGR)
+        return cv2.imread(self.image_path)
+        
 
     def detect_line_segments(self, enable_thining=True):
         preprocessed_image = self.pre_process_image(enable_thining)
@@ -22,7 +36,8 @@ class LineDetectionService:
             maxLineGap=None
         )
 
-        return line_segments
+        return [ ls[0] for ls in line_segments ]
+        
     
     def pre_process_image(self, enable_thining=False):
         """
@@ -30,7 +45,7 @@ class LineDetectionService:
             removes the bounding boxes (symbol and words) to only leave the lines behind so that they can be detected.
         """
         # 1. read image in cv2
-        image = cv2.imread(self.image_path)
+        image = self.get_image()
 
         # 2. Clear symbol and word bounding boxes
         hist = cv2.calcHist([image], [0], None, [256], [0, 256])
@@ -59,3 +74,75 @@ class LineDetectionService:
             image = processed_image_with_thining
 
         return image
+
+
+    def get_slope_between_points(self, x1, y1, x2, y2):
+        '''
+        Returns the slope between two points.
+        '''
+        x_delta = x2 - x1
+        if x_delta == 0:
+            return math.inf
+        return (y2 - y1) / x_delta
+
+
+    def extend_lines(self, line_segments = []):
+        '''
+            param line_segments: List[(startX, startY, endX, endY)] (0, 1, 2, 3)
+            param line_segment_padding_default: padding provided in the config
+        '''
+        padding = self.line_padding
+        thickness = self.line_thickness
+        extended_line_segments = []
+
+        for line in line_segments:
+            slope = self.get_slope_between_points(line[0], line[1],
+                                            line[2], line[3])
+            
+            startX, startY, endX, endY = line[0], line[1], line[2], line[3]
+            
+            b = 0
+            if slope != math.inf:
+                b = startY - slope * startX
+            
+            if slope == math.inf:
+                start_x = startX - thickness
+                end_x = endX + thickness
+
+                y1 = startY + padding
+                y2 = endY - padding
+                first = Point(start_x, y1)
+                second = Point(end_x, y2)
+                
+                distance_1 = first.distance(second)
+
+                _y1 = startY - padding
+                _y2 = endY + padding
+
+                _first = Point(start_x, _y1)
+                _second = Point(end_x, _y2)
+
+                distance_2 = _first.distance(_second)
+
+                if distance_1 > distance_2:            
+                    start_y = y1
+                    end_y = y2
+                else:
+                    start_y = _y1
+                    end_y = _y2
+            else:
+                start_x = startX - padding
+                start_y = slope * start_x + b + thickness
+                end_x = endX + padding
+                end_y = slope * end_x + b - thickness
+
+            extended_line_segments.append(
+                [
+                    start_x,
+                    start_y,
+                    end_x,
+                    end_y
+                ]
+            )
+
+        return extended_line_segments

@@ -4,6 +4,7 @@ import numpy as np
 from src.models.pid_data_point import PidDataPoint
 from src.utils.convert_raw_data_to_symbols import convert_raw_data_to_symbols
 from src.utils.convert_raw_data_to_lines import convert_raw_data_to_lines
+from src.utils.convert_raw_data_to_bounding_box import convert_raw_data_to_bounding_box
 from config import config
 
 class DataConverterService:
@@ -51,7 +52,7 @@ class DataConverterService:
         datapoint = PidDataPoint()
         datapoint.lines = convert_raw_data_to_lines(lines)
         datapoint.symbols = convert_raw_data_to_symbols(symbols)
-        datapoint.words = convert_raw_data_to_symbols(symbols)
+        datapoint.words = convert_raw_data_to_bounding_box(words)
 
         # for the current dataset, all of the images are in jpg format
         datapoint.image_path = f"{self.dataset_path}/{self.image_dir_name}/{path_to_load}.jpg"

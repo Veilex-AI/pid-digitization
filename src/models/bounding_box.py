@@ -5,6 +5,6 @@ class BoundingBox(BaseModel):
     """
         represents a bounding box with source and destination point.
     """
-    name: str
+    name: str = ""
     pointSrc: Vertex
     pointDest: Vertex
