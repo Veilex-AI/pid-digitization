@@ -1,10 +1,12 @@
-import os
-from typing import List
-import numpy as np
+from src.enums.annotation_type import AnnotationType
 from src.models.pid_data_point import PidDataPoint
 from src.utils.convert_raw_data_to_symbols import convert_raw_data_to_symbols
 from src.utils.convert_raw_data_to_lines import convert_raw_data_to_lines
 from src.utils.convert_raw_data_to_bounding_box import convert_raw_data_to_bounding_box
+
+import os
+from typing import List
+import numpy as np
 from config import config
 
 class DataConverterService:
@@ -40,9 +42,9 @@ class DataConverterService:
         annotation_path = '{}/{}'.format(self.dataset_path, self.annotation_dir_name)
         # list of directories with annotation labeled from 0 to N (number)
 
-        line_path = os.path.join(annotation_path, path_to_load, "{}_lines.npy".format(path_to_load))
-        symbols_path = os.path.join(annotation_path, path_to_load, "{}_symbols.npy".format(path_to_load))
-        words_path = os.path.join(annotation_path, path_to_load, "{}_words.npy".format(path_to_load))
+        line_path = os.path.join(annotation_path, path_to_load, f"{path_to_load}_{AnnotationType.LINES.value}.npy")
+        symbols_path = os.path.join(annotation_path, path_to_load, f"{path_to_load}_{AnnotationType.SYMBOLS.value}.npy")
+        words_path = os.path.join(annotation_path, path_to_load, f"{path_to_load}_{AnnotationType.WORDS.value}.npy")
 
         lines = np.load(line_path, allow_pickle=True)
         symbols = np.load(symbols_path, allow_pickle=True)
