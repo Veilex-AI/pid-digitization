@@ -1,8 +1,7 @@
 from PIL import Image
 from PIL.ImageFile import ImageFile
 
-def segment_image(image_path: str, chunk_size=1080):
-        image = Image.open(image_path)
+def segment_image(image: ImageFile, chunk_size=1080):
         width, height = image.size
 
         x_chunks = (width + chunk_size - 1) // chunk_size
