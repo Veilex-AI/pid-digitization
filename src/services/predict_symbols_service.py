@@ -2,21 +2,27 @@ from config import config
 import time
 from ultralytics import YOLO
 from src.utils.segment_image import segment_image
+from PIL import ImageFile, Image
+
 
 class PredictSymbolsService:
     model_path: str
-    image_path: str
+    image_path: str = ""
     model: YOLO = None
+    image_pil: ImageFile = None
 
-    def __init__(self, image_path: str):
+    def __init__(self, image_path: str = ""):
         self.image_path = image_path
         self.model_path = config.model_path
+
+    def get_image(self):
+        return Image.open(self.image_path)
 
     def predict_bounding_boxes(self):
         if(self.model is None): self.load_model()
 
         start = time.time()
-        chunks_arr = segment_image(self.image_path, chunk_size=1080)
+        chunks_arr = segment_image(self.get_image(), chunk_size=1080)
         bboxes = []
         for i, row in enumerate(chunks_arr):
             for j, chunk in enumerate(row):

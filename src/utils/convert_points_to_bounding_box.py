@@ -1,10 +1,10 @@
-from typing import List
+from typing import List, Tuple
 
-from models.bounding_box import BoundingBox
-from models.vertex import Vertex
+from src.models.bounding_box import BoundingBox
+from src.models.vertex import Vertex
 
 
-def convert_points_to_bounding_box(points: List[List[float, float, float, float]]):
+def convert_points_to_bounding_box(points):
     arr_list = []
     for point in points:
         [x1, y1, x2, y2] = point

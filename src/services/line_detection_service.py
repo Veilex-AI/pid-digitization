@@ -1,28 +1,26 @@
 import math
 from typing import List
 import cv2
-from PIL import Image
-from PIL import ImageFile
 import numpy as np
 from shapely.geometry import Point
 from src.models.bounding_box import BoundingBox
+from src.utils import get_slope_between_points
 
 class LineDetectionService:
     image_path: str = ""
     bounding_boxes: List[BoundingBox] = []
-    image_pil: ImageFile
     line_padding: float = 15
     line_thickness: float = 2
     
 
-    def __init__(self, image_pil: ImageFile = None, image_path: str = "", bounding_boxes: List[BoundingBox] = []):
+    def __init__(self, image_path: str = "", bounding_boxes: List[BoundingBox] = []):
         self.image_path = image_path
         self.bounding_boxes = bounding_boxes
-        self.image_pil = image_pil
 
     def get_image(self):
-        if not self.image_path:
-            return cv2.cvtColor(np.array(self.image_pil), cv2.COLOR_RGB2BGR)
+        # kind of deprecated piece of code. this is not required now.
+        # if not self.image_path:
+        #     return cv2.cvtColor(np.array(self.image_pil), cv2.COLOR_RGB2BGR)
         return cv2.imread(self.image_path)
         
 
@@ -75,17 +73,6 @@ class LineDetectionService:
 
         return image
 
-
-    def get_slope_between_points(self, x1, y1, x2, y2):
-        '''
-        Returns the slope between two points.
-        '''
-        x_delta = x2 - x1
-        if x_delta == 0:
-            return math.inf
-        return (y2 - y1) / x_delta
-
-
     def extend_lines(self, line_segments = []):
         '''
             param line_segments: List[(startX, startY, endX, endY)] (0, 1, 2, 3)
@@ -96,7 +83,7 @@ class LineDetectionService:
         extended_line_segments = []
 
         for line in line_segments:
-            slope = self.get_slope_between_points(line[0], line[1],
+            slope = get_slope_between_points(line[0], line[1],
                                             line[2], line[3])
             
             startX, startY, endX, endY = line[0], line[1], line[2], line[3]

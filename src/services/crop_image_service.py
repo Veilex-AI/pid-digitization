@@ -46,3 +46,6 @@ class CropImageService:
     
     def save_cropped_image():
         pass
+
+    def save_annotated_result_in_npy_format():
+        pass

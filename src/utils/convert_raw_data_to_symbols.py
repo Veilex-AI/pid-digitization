@@ -4,7 +4,7 @@ from src.models.vertex import Vertex
 from src.models.symbol import Symbol
 
 
-def convert_raw_data_to_symbols(raw_symbol_arr: List[Union[str, List[int], str]]):
+def convert_raw_data_to_symbols(raw_symbol_arr: List[Union[str, List[float], str]]):
     """
         converts raw PID dataset to python pydanctic symbol array
     """

@@ -7,18 +7,14 @@ from src.models.bounding_box import BoundingBox
 
 class ImageDisplayService:
     image_path: str = ""
-    image_pil: ImageFile = None
     bounding_boxes: List[BoundingBox] = []
     labels: List[str] = []
 
-    def __init__(self, image_pil: ImageFile = None, image_path: str = "", bounding_boxes: List[BoundingBox] = []):
-        self.image_pil = image_pil
+    def __init__(self, image_path: str = "", bounding_boxes: List[BoundingBox] = []):
         self.image_path = image_path
         self.bounding_boxes = bounding_boxes
 
     def get_image(self):
-        if not self.image_path:
-            return self.image_pil
         return Image.open(self.image_path)
     
     def display_image_with_bbox(self, color='red', dpi=200):
