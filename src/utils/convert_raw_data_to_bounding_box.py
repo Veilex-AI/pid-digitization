@@ -15,7 +15,6 @@ def convert_raw_data_to_bounding_box(raw_bb_arr: List[Union[str, List[int], str,
         bounding_box_list.append(
             BoundingBox(
                 name = name,
-                line_type = type,
                 pointSrc = Vertex(x=x1, y=y1),
                 pointDest = Vertex(x=x2, y=y2)
             )
