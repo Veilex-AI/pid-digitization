@@ -5,3 +5,4 @@ ultralytics==8.3.54
 opencv-contrib-python==4.10.0.84
 pydantic-settings==2.7.0
 matplotlib==3.10.0
+networkx==3.4.2
