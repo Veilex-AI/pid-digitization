@@ -48,7 +48,6 @@ class DataConverterService:
 
         lines = np.load(line_path, allow_pickle=True)
         symbols = np.load(symbols_path, allow_pickle=True)
-        # not required for current version/implementation
         words = np.load(words_path, allow_pickle=True)
 
         datapoint = PidDataPoint()

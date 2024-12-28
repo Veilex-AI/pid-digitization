@@ -10,9 +10,9 @@ def convert_raw_data_to_lines(raw_line_arr: List[Union[str, List[int], str, str]
     """
     lines: List[Line] = []
     for s in raw_line_arr:
-        type = s[3]
         name = s[0]
         [x1, y1, x2, y2] = s[1]
+        type = s[3]
         lines.append(
             Line(
                 name = name,
