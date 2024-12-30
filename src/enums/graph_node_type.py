@@ -7,3 +7,4 @@ class GraphNodeType(str, Enum):
     line = 'line'
     symbol = 'symbol'
     text = 'text'  # Not used for creating the graph, just as a intermediate for candidate matching
+    connector = 'connector'

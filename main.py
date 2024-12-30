@@ -1,5 +1,7 @@
 from matplotlib.image import BboxImage
 from config import config
+from src.models.symbol import Symbol
+from src.models.line import Line
 from src.services.crop_image_service import CropImageService
 from src.models.bounding_box import BoundingBox
 from src.models.vertex import Vertex
@@ -7,8 +9,4 @@ from src.services.image_display_serivce import ImageDisplayService
 from src.services.line_detection_service import LineDetectionService
 from src.services.predict_symbols_service import PredictSymbolsService
 from src.services.data_converter_service import DataConverterService
-
-
-print(
-    'perform your main functions here.'
-)
+from src.utils.convert_points_to_bounding_box import convert_points_to_bounding_box

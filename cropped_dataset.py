@@ -46,16 +46,16 @@ for s_index, sample in enumerate(cropped_image_coordinates):
 
         # save all the line annotations
         all_filtered_lines = []
-        for point in datapoint.lines:
-            ann = crop_image.adjust_filtered_annotations(annotations=[point])
+        for line in datapoint.lines:
+            ann = crop_image.adjust_filtered_annotations(annotations=[line])
             if(len(ann) == 0): continue
             bbox = convert_points_to_bounding_box(
                 ann[0]
             )
             all_filtered_lines.append(
                 Line(
-                    name= point.name,
-                    line_type= point.line_type,
+                    name= line.name,
+                    line_type= line.line_type,
                     pointSrc=bbox.pointSrc,
                     pointDest=bbox.pointDest
                 )
@@ -68,15 +68,15 @@ for s_index, sample in enumerate(cropped_image_coordinates):
         # save all the symbol annotations.
         all_filtered_symbols = []
         for symbol in datapoint.symbols:
-            ann = crop_image.adjust_filtered_annotations(annotations=[point])
+            ann = crop_image.adjust_filtered_annotations(annotations=[symbol])
             if(len(ann) == 0): continue
             bbox = convert_points_to_bounding_box(
                 ann[0]
             )
             all_filtered_symbols.append(
                 Symbol(
-                    name= point.name,
-                    label=point.label,
+                    name= symbol.name,
+                    label=symbol.label,
                     pointSrc=bbox.pointSrc,
                     pointDest=bbox.pointDest
                 )

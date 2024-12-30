@@ -8,6 +8,7 @@ from shapely.geometry import Point
 import math
 
 """
+    DEPRECATED:
     In this example we test out the line detection technique using hough transform.
     the lines are predicted by the opencv model. however, the opencv model requires that the other artifacts such as 
     symbols and words should be removed for only the lines to be remained so that they can traced in the image.
@@ -38,9 +39,9 @@ def get_shortning_images_data():
         # [0, (4946, 2101, 5307, 2880)],
         # [0, (2523, 3827, 3466, 4043)],
         # [0, (1650, 602, 2137, 1608)],
-        [1, (4668, 3272, 5016, 4164)],
-        [1, (720, 3335, 1846, 4183)],
-        # [1, (2662, 387, 3251, 634)],
+        # [1, (4668, 3272, 5016, 4164)],
+        # [1, (720, 3335, 1846, 4183)],
+        [1, (2662, 387, 3251, 634)],
         # [2, (530, 3348, 1258, 4012)],
         # [2, (555, 431, 1739, 1184)],
         # [2, (3111, 1880, 3630, 2690)]

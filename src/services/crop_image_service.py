@@ -69,7 +69,7 @@ class CropImageService:
             (x1, y1) = annotate.pointSrc.get_dimensions()
             (x2, y2) = annotate.pointDest.get_dimensions()
 
-            arr.append([name, [x1, y1, x2, y2], line_type])
+            arr.append([name, [x1, y1, x2, y2], '', line_type])
 
         if not os.path.exists(os.path.dirname(save_path)):
             os.makedirs(os.path.dirname(save_path))

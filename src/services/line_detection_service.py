@@ -4,12 +4,12 @@ import cv2
 import numpy as np
 from shapely.geometry import Point
 from src.models.bounding_box import BoundingBox
-from src.utils import get_slope_between_points
+from src.utils.get_slope_between_points import get_slope_between_points
 
 class LineDetectionService:
     image_path: str = ""
     bounding_boxes: List[BoundingBox] = []
-    line_padding: float = 15
+    line_padding: float = 8
     line_thickness: float = 2
     
 
@@ -87,7 +87,7 @@ class LineDetectionService:
                                             line[2], line[3])
             
             startX, startY, endX, endY = line[0], line[1], line[2], line[3]
-            
+
             b = 0
             if slope != math.inf:
                 b = startY - slope * startX
@@ -101,7 +101,7 @@ class LineDetectionService:
                 first = Point(start_x, y1)
                 second = Point(end_x, y2)
                 
-                distance_1 = first.distance(second)
+                source_line_distance_after_padding = first.distance(second)
 
                 _y1 = startY - padding
                 _y2 = endY + padding
@@ -109,9 +109,9 @@ class LineDetectionService:
                 _first = Point(start_x, _y1)
                 _second = Point(end_x, _y2)
 
-                distance_2 = _first.distance(_second)
+                dest_line_distance_after_padding = _first.distance(_second)
 
-                if distance_1 > distance_2:            
+                if source_line_distance_after_padding > dest_line_distance_after_padding:            
                     start_y = y1
                     end_y = y2
                 else:
@@ -133,3 +133,6 @@ class LineDetectionService:
             )
 
         return extended_line_segments
+    
+    def get_line_distance_offset(self, distance):
+        return (1000 if distance > 1000 else distance) / 1000
