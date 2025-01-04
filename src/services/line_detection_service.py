@@ -5,6 +5,7 @@ import numpy as np
 from shapely.geometry import Point
 from src.models.bounding_box import BoundingBox
 from src.utils.get_slope_between_points import get_slope_between_points
+from src.utils.calculate_distance_between_points import calculate_distance_between_points
 
 class LineDetectionService:
     image_path: str = ""
@@ -88,6 +89,8 @@ class LineDetectionService:
             
             startX, startY, endX, endY = line[0], line[1], line[2], line[3]
 
+            updated_padding = self.get_line_padding(startX, startY, endX, endY)
+
             b = 0
             if slope != math.inf:
                 b = startY - slope * startX
@@ -96,15 +99,15 @@ class LineDetectionService:
                 start_x = startX - thickness
                 end_x = endX + thickness
 
-                y1 = startY + padding
-                y2 = endY - padding
+                y1 = startY + updated_padding
+                y2 = endY - updated_padding
                 first = Point(start_x, y1)
                 second = Point(end_x, y2)
                 
                 source_line_distance_after_padding = first.distance(second)
 
-                _y1 = startY - padding
-                _y2 = endY + padding
+                _y1 = startY - updated_padding
+                _y2 = endY + updated_padding
 
                 _first = Point(start_x, _y1)
                 _second = Point(end_x, _y2)
@@ -118,9 +121,9 @@ class LineDetectionService:
                     start_y = _y1
                     end_y = _y2
             else:
-                start_x = startX - padding
+                start_x = startX - updated_padding
                 start_y = slope * start_x + b + thickness
-                end_x = endX + padding
+                end_x = endX + updated_padding
                 end_y = slope * end_x + b - thickness
 
             extended_line_segments.append(
@@ -136,3 +139,12 @@ class LineDetectionService:
     
     def get_line_distance_offset(self, distance):
         return (1000 if distance > 1000 else distance) / 1000
+    
+    def get_line_padding(self, startX, startY, endX, endY):
+        """
+            increase the padding with 1.5 time the length if the line is too short.
+        """
+        distance = calculate_distance_between_points((startX, startY), (endX, endY))
+        if distance < 40:
+            return self.line_padding * 2
+        return self.line_padding

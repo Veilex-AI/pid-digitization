@@ -1,6 +1,6 @@
 import math
 
-def calculate_distance(box1, box2):
+def calculate_distance_between_rectangles(box1, box2):
     # Unpack box coordinates
     x1, y1, x2, y2 = box1
     x3, y3, x4, y4 = box2

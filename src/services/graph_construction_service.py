@@ -96,8 +96,11 @@ class GraphConstructionService:
 
             if self.graph.nodes[v].get('type') == GraphNodeType.line and len(list(self.graph.neighbors(v))) == 1:
                 self.graph.remove_node(v)
-    
 
+    def remove_single_connection_line_nodes(self):
+        single_connection_nodes = [node for node, degree in self.graph.degree() if degree == 1 and self.graph.nodes[node]['type'] == GraphNodeType.line]
+        self.graph.remove_nodes_from(single_connection_nodes)
+    
     def get_node_intersections(self) -> dict[str, list[str]]:
         nodes = [ *self.line_segments, *self.symbols ]
         intersection = {}
