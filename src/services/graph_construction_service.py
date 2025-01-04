@@ -38,13 +38,20 @@ class GraphConstructionService:
 
         self.graph = graph
 
-    def get_line_cycle_list(self):
+    def get_line_cycle_list(self, degree=0):
         line_nodes = self.get_line_nodes()
         cycles = list(nx.simple_cycles(self.graph))
 
-        filtered = [cycle if all(node in line_nodes for node in cycle) else None for cycle in cycles]
+        # finds cycles with n-degree (defined in the parameter)
+        filtered_cycles = [cycle for cycle in cycles if all(node in line_nodes for node in cycle) and len(cycle) == degree]
 
-        return [x for x in filtered if x is not None]
+        # gets only the unique results.
+        unique_cycles = set(
+            [ tuple(sorted(f)) for f in filtered_cycles ]
+        )
+
+        return [sorted(list(cycle)) for cycle in unique_cycles]
+
 
     def define_graph_edges(self):
         intersections = self.get_node_intersections()
@@ -57,20 +64,23 @@ class GraphConstructionService:
 
     
     def reduce_line_cycles(self):
-        line_cycles = self.get_line_cycle_list()
+        for degree in [4, 3]:
+            line_cycles = self.get_line_cycle_list(degree=degree)
 
-        for index, cycle in enumerate(line_cycles):
-            node_id = f"p-{index}"
-            self.graph.add_node(node_id, type=GraphNodeType.connector)
-            
-            # Connect the new node P to all nodes in the cycle
-            for node in cycle:
-                self.graph.add_edge(node_id, node)
-            
-            # Remove the edges forming the cycle
-            for i in range(len(cycle)):
-                if self.graph.has_edge(cycle[i], cycle[(i + 1) % len(cycle)]):
-                    self.graph.remove_edge(cycle[i], cycle[(i + 1) % len(cycle)])
+            for index, cycle in enumerate(line_cycles):
+                node_id = f"p-{index}"
+                self.graph.add_node(node_id, type=GraphNodeType.connector)
+                
+                # Connect the new node P to all nodes in the cycle
+                for node in cycle:
+                    self.graph.add_edge(node_id, node)
+                
+                # Remove the edges forming the cycle
+                # for i in range(len(cycle)):
+                #     if self.graph.has_edge(cycle[i], cycle[(i + 1) % len(cycle)]):
+                #         self.graph.remove_edge(cycle[i], cycle[(i + 1) % len(cycle)])
+
+                self.graph.remove_edges_from([(u,v) for u in cycle for v in cycle if u != v])
 
     def remove_unnecessary_lines(self):
         """
