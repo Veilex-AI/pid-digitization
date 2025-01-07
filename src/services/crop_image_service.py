@@ -12,6 +12,11 @@ from src.models.bounding_box import BoundingBox
 
 
 class CropImageService:
+    """
+        A service to store the cropped image to the desired directory
+        and filter annotations with specified dimensions.
+    """
+
     image_path: str
     cropped_dimensions: BoundingBox = None
 
@@ -20,10 +25,16 @@ class CropImageService:
         self.cropped_dimensions = cropped_dimensions
 
 
-    def get_image(self):
+    def get_image(self) -> ImageFile:
+        """
+            Returns the image in PIL format.
+        """
         return Image.open(self.image_path)
 
     def crop_image(self) -> ImageFile:
+        """
+            Applies crop on the given image through cropped dimensions class based attribute  
+        """
         (x1, y1) = self.cropped_dimensions.pointSrc.get_dimensions()
         (x2, y2) = self.cropped_dimensions.pointDest.get_dimensions()
 
@@ -32,7 +43,10 @@ class CropImageService:
         return cropped_image
         
 
-    def adjust_filtered_annotations(self, annotations: List[BoundingBox]):
+    def adjust_filtered_annotations(self, annotations: List[BoundingBox]) -> List[Tuple[float, float, float, float]]:
+        """
+            Filters in only those annotations/labels that are within the cropped image dimensions.
+        """
         new_annotations: List[Tuple[float, float, float, float]] = []
         for annotate in annotations:
             (x1, y1) = annotate.pointSrc.get_dimensions()
@@ -50,7 +64,7 @@ class CropImageService:
     
     def save_cropped_image(self, save_path: str):
         """
-            thake the path of the image and save it to the desired directory that comes from the parameters.
+            Save the path in desired directory.
         """
         image  = self.crop_image()
         if image is not None:
@@ -62,6 +76,9 @@ class CropImageService:
     # below there are three functions described but they are absolutely doing the same thing. this needs to be changed. 
 
     def save_line_annotated_result_in_npy_format(self, annotations: List[Line], save_path: str):
+        """
+            Saves the provided line annotations in the npy file extension.
+        """
         arr = []
         for annotate in annotations:
             name = annotate.name
@@ -77,6 +94,9 @@ class CropImageService:
         np.save(save_path, np.array(arr, dtype=object))
 
     def save_symbol_annotated_result_in_npy_format(self, annotations: List[Symbol], save_path: str):
+        """
+            Saves the provided Symbol annotations in the npy file extension.
+        """
         arr = []
         for annotate in annotations:
             name = annotate.name
@@ -92,6 +112,9 @@ class CropImageService:
         np.save(save_path, np.array(arr, dtype=object))
 
     def save_word_annotated_result_in_npy_format(self, word_annotations: List[BoundingBox], save_path: str):
+        """
+            Saves the provided Word annoatations in the npy file extension.
+        """
         arr = []
         for annotate in word_annotations:
             name = annotate.name

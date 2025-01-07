@@ -19,6 +19,9 @@ class LineDetectionService:
         self.bounding_boxes = bounding_boxes
 
     def get_image(self):
+        """
+            get the image in OpenCV compatible format.
+        """
         # kind of deprecated piece of code. this is not required now.
         # if not self.image_path:
         #     return cv2.cvtColor(np.array(self.image_pil), cv2.COLOR_RGB2BGR)
@@ -76,6 +79,10 @@ class LineDetectionService:
 
     def extend_lines(self, line_segments = []):
         '''
+            Increases the length of the line segments for easier interaction detection beteween line to line and line to symbol interconnections.
+            vertical line increases vertically.
+            horizontal line increases horizontally.
+
             param line_segments: List[(startX, startY, endX, endY)] (0, 1, 2, 3)
             param line_segment_padding_default: padding provided in the config
         '''
@@ -137,14 +144,11 @@ class LineDetectionService:
 
         return extended_line_segments
     
-    def get_line_distance_offset(self, distance):
-        return (1000 if distance > 1000 else distance) / 1000
-    
-    def get_line_padding(self, startX, startY, endX, endY):
+    def get_line_padding(self, startX, startY, endX, endY, multiplier = 2):
         """
-            increase the padding with 1.5 time the length if the line is too short.
+            increase the padding with a multiplier if the line is too short.
         """
         distance = calculate_distance_between_points((startX, startY), (endX, endY))
         if distance < 40:
-            return self.line_padding * 2
+            return self.line_padding * multiplier
         return self.line_padding

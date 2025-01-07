@@ -1,3 +1,4 @@
+from typing import List, Tuple
 from config import config
 import time
 from ultralytics import YOLO
@@ -14,15 +15,21 @@ class PredictSymbolsService:
         self.image_path = image_path
         self.model_path = config.model_path
 
-    def get_image(self):
+    def get_image(self) -> ImageFile:
+        """
+            retunrs a PIL Image
+        """
         return Image.open(self.image_path)
 
-    def predict_bounding_boxes(self):
+    def predict_bounding_boxes(self) -> List[Tuple[Tuple[float, float, float, float], str]]:
+        """
+            identify the symbols through bounding boxes (x1, x2, y1, y2) using a pretrained YOLO model. 
+        """
         if(self.model is None): self.load_model()
 
         start = time.time()
         chunks_arr = segment_image(self.get_image(), chunk_size=1800)
-        bboxes = []
+        bboxes: List[Tuple[Tuple[float, float, float, float], str]] = []
         for i, row in enumerate(chunks_arr):
             for j, chunk in enumerate(row):
                 result: list[YOLO] = self.model(source=chunk)
@@ -50,5 +57,8 @@ class PredictSymbolsService:
 
         return bboxes
     
-    def load_model(self):
+    def load_model(self) -> None:
+        """
+            initialize the YOLO model
+        """
         self.model = YOLO(self.model_path)

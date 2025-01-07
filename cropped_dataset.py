@@ -7,6 +7,11 @@ from src.utils.convert_points_to_bounding_box import convert_points_to_bounding_
 
 from config import config
 
+"""
+    A short code for providing an image with multiple but small cropped dimensions to select a subsection of pid for easy training.
+    The images are stored in the upload dir path right after they have been cropped
+"""
+
 pid_cropped_part_of_image = [0, (4946, 2101, 5307, 2880)]
 
 upload_dir = "D:\\Volume C\\dataset\\cropped"

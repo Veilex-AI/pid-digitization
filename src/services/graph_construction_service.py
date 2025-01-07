@@ -9,6 +9,11 @@ from src.utils.bounding_box_to_polygon import bounding_box_to_polygon
 
 
 class GraphConstructionService:
+    """
+        A graph service responsible for graph management.
+        Utalized to create, modify, prune the graph alongside other functionalities.
+    """
+
     graph: Graph = None
     symbols: list[Symbol] = []
     line_segments: list[BoundingBox] = []
@@ -18,8 +23,10 @@ class GraphConstructionService:
         self.line_segments = line_segments
         self.initialize_graph()
 
-    def initialize_graph(self):
+    def initialize_graph(self) -> None:
         '''
+            initializes the graph with line and symbol nodes.
+
             symbols: list of sybols with label and bounding box
             lines: (startX, startY, endX, endY) line segments coordinate
         '''
@@ -39,6 +46,9 @@ class GraphConstructionService:
         self.graph = graph
 
     def get_line_cycle_list(self, degree=0):
+        """
+            gets all graph cycles.
+        """
         line_nodes = self.get_line_nodes()
         cycles = list(nx.simple_cycles(self.graph))
 
@@ -64,6 +74,9 @@ class GraphConstructionService:
 
     
     def reduce_line_cycles(self):
+        """
+            Remove all redundent line cycles.
+        """
         for degree in [4, 3]:
             line_cycles = self.get_line_cycle_list(degree=degree)
 
@@ -112,6 +125,9 @@ class GraphConstructionService:
         self.graph.remove_nodes_from(single_connection_nodes)
     
     def get_node_intersections(self) -> dict[str, list[str]]:
+        """
+            figures out all possible interactions via polygon, creates a key-value pair if interaction exist.
+        """
         nodes = [ *self.line_segments, *self.symbols ]
         intersection = {}
 
@@ -131,7 +147,7 @@ class GraphConstructionService:
         
         return intersection
     
-    def set_largest_graph_connected_nodes(self):
+    def set_largest_graph_connected_nodes(self) -> None:
         connected_components = list(nx.connected_components(self.graph))
         largest_component = max(connected_components, key=len)
         self.graph = self.graph.subgraph(largest_component).copy()

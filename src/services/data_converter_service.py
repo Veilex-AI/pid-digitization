@@ -19,9 +19,9 @@ class DataConverterService:
         self.image_dir_name = config.image_dir_name
         self.annotation_dir_name = config.annotation_dir_name
 
-    def load_dataset(self):
+    def load_dataset(self) -> List[PidDataPoint]:
         """
-            loads the entire pid dataset and stores it in PidDataPoint model that is defined in src.models directory
+            loads the pid dataset
         """
         pid_datapoints: List[PidDataPoint] = []
         annotation_path = '{}/{}'.format(self.dataset_path, self.annotation_dir_name)
@@ -34,10 +34,9 @@ class DataConverterService:
 
         return pid_datapoints
     
-    def load_single_datapoint(self, path_to_load:str):
+    def load_single_datapoint(self, path_to_load:str) -> PidDataPoint:
         """
-            loads only a single datapoint from the entire dataset.
-            used only when a number of datapoints are required with optimization
+            loads a single datapoint from the entire dataset.
         """
         annotation_path = '{}/{}'.format(self.dataset_path, self.annotation_dir_name)
         # list of directories with annotation labeled from 0 to N (number)

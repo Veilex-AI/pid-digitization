@@ -1,5 +1,5 @@
 from typing import List
-from PIL import Image
+from PIL import Image, ImageFile
 import matplotlib.pyplot as plt
 from src.models.bounding_box import BoundingBox
 import networkx as nx
@@ -13,12 +13,15 @@ class ImageDisplayService:
         self.image_path = image_path
         self.bounding_boxes = bounding_boxes
 
-    def get_image(self):
+    def get_image(self) -> ImageFile:
+        """
+            get the image
+        """
         return Image.open(self.image_path)
     
-    def display_image_with_bbox(self, color='red', dpi=200):
+    def display_image_with_bbox(self, color='red', dpi=200) -> None:
         """
-            only supports matplot-lib.
+            displays image using matplot lib
         """
         plt.figure(figsize=(10, 8), dpi=dpi)
         plt.imshow(self.get_image())
@@ -39,7 +42,10 @@ class ImageDisplayService:
         plt.axis('off')
         plt.show()
 
-    def display_graph(self, graph, node_size=100):
+    def display_graph(self, graph, node_size=100) -> None:
+        """
+            displays a graph in matplotlib with nx support.
+        """
         plt.clf()
         plt.figure(figsize=(8, 6))
         nx.draw(graph, with_labels=True, node_size=node_size, node_color="lightgreen", font_size=10, font_weight="bold")
