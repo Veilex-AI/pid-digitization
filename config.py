@@ -5,6 +5,13 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Config(BaseSettings):
+    """
+        param model_path: the path of YOLO model. used for symbol detection.
+        param upload_path: the path where additional data can be uploaded.
+        param dataset_path: the path of the original dataset.
+        param image_dir_name: dir name where the images are stored in the dataset_path
+        param annotation_dir_name: dir name where the annoations (of images) are stored in the dataset_path.
+    """
     model_path: str
     upload_path: str
     dataset_path: str
