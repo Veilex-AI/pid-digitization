@@ -30,7 +30,6 @@ def create_dataset_data_segments(chuck_size: int):
             if(len(filtered_symbols) == 0):
                 continue
 
-            labels_with_normalized_coordinates = []
             (image_width, image_height) = service.get_image_dimensions()
             
             
