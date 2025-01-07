@@ -14,7 +14,7 @@ from config import config
 
 pid_cropped_part_of_image = [0, (4946, 2101, 5307, 2880)]
 
-upload_dir = "D:\\Volume C\\dataset\\cropped"
+upload_dir = config.upload_path
 cropped_image_samples = [0, (4946, 2101, 5307, 2880)]
 cropped_image_coordinates = [
     [0, [(4946, 2101, 5307, 2880), (2523, 3827, 3466, 4043), (1650, 602, 2137, 1608)]],
