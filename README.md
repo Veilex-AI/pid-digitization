@@ -19,12 +19,13 @@ https://www.notion.so/Thesis-Extracting-Semantic-Relationship-from-visual-diagra
 
 <br>
 
-#### Feature provided by the repository
-- **Data Conversion**:
-- **Symbol Prediction**:
-- **Line Detection**:
-- **Displaying Image**:
-- **Graph Construction**:
+#### Feature provided by the project
+- **Data Conversion**: Converts the image with annotated data into a python readable format. 
+- **Symbol Prediction**: Predicts the symbol bounding boxes in the image using YOLO object detection model. The model is trained using YOLOv8. A already trained path is provided via the configuration to predict the results.
+- **Line Detection**: Uses Hough Transformation, a computer vision techniuqe, to detect lines on the pid image.
+- **Displaying Image**: Responsible for displaying bounding boxes images and graph based images using matplot lib library.
+- **Graph Construction**: A Graph management class that uses techniques to create graph and removes all redundiences in the graph structure.
+- **Crop Image**: Crops the image with desired dimensions. ability to filter and adjusts the annotations vertcies that are within the provided dimensions of the image. Moreover, can save the crop result back to its upload path.  
 
 
 #### Purpose of the config file
@@ -33,6 +34,11 @@ mention the purpose of the config files here.
 #### Other files
 mention other files in root here
 
+
+#### Future Tasks
+- Features to be built around a FastAPI model which will make testing different parts of the application easier. This will allow easier integration with other systems that want to use these features as plugin modules.
+
+<br>
 
 The repo is primarily designed around a "piping and instrumentation diagram" dataset that is taken from the following link
 https://drive.google.com/drive/u/0/folders/1gMm_YKBZtXB3qUKUpI-LF1HE_MgzwfeR
