@@ -29,10 +29,21 @@ https://www.notion.so/Thesis-Extracting-Semantic-Relationship-from-visual-diagra
 
 
 #### Purpose of the config file
-mention the purpose of the config files here.
+The configuration file consists of imperative key-value pairs that need to be assigned for the source-code features to work succesfully.
+The config file consists of the following key-value pairs.
+
+- **MODEL_PATH**: The path of YOLO object detection model, responsible for identifying symbols in an PID image
+- **UPLOAD_PATH**: The path where selected files/images can be uploaded.
+- **DATASET_PATH**: The path where the entire dataset exist, which can be used for prediction and can be used for other testing purposes.
+- **IMAGE_DIR_NAME**: name of the folder, consisting of images, which is inside "DATASET_PATH"
+- **ANNOTATION_DIR_NAME**: name of the annotation folder, consisting of annotations, which is inside "DATASET_PATH"
 
 #### Other files
-mention other files in root here
+Some other files have been designed to test the service features either independently or in combination to validate their successfull working.
+
+- **cropped_dataset**: Uses data conversion service and crop image service to crop a larger image into smaller images with desired dimensions provided by the user.
+- **graph_construction**: test graph construction service test graph functions to check if the provided result can be converted into a minimilistic graph with fewest redundencies.
+- **line_detection_test**: checks if line segments are being detect from the pid image. 
 
 
 #### Future Tasks
