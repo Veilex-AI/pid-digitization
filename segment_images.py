@@ -35,8 +35,8 @@ def create_dataset_data_segments(chuck_size: int):
             
             service.save_cropped_image(f"{config.upload_path}/images/{dp_index}_{s_index}.jpg")
 
-            # save labeled annoations in text based format.
-            # for every line, there is a label followed by 4 coordinates (i.e. '5' 0.4 0.2 0.5 0.1)
+            # save labeled annoations in text based format (for YOLO object detection training).
+            # for every line, there is a label (type of symbol is also a label) followed by 4 normalized (with range 0-1) coordinates (i.e. '5' 0.4 0.2 0.5 0.1)
             label_path_file = f"{config.upload_path}/labels/{dp_index}_{s_index}.jpg.txt"
             os.makedirs(os.path.dirname(label_path_file), exist_ok=True)
             with open(label_path_file, 'w') as file:
@@ -52,4 +52,4 @@ def create_dataset_data_segments(chuck_size: int):
                     
 
 if __name__ == "__main__":
-    create_dataset_data_segments(3200)
+    create_dataset_data_segments(2160)
