@@ -48,6 +48,7 @@ Some other files have been designed to test the service features either independ
 
 #### Future Tasks
 - Features to be built around a FastAPI model which will make testing different parts of the application easier. This will allow easier integration with other systems that want to use these features as plugin modules.
+- The PID documents do not have any graph annotations, which means they need to be created. Create graph annotations to test if the annotation created by your program is accurate, eventhough the graph that is created is not created through an ML model.
 
 <br>
 

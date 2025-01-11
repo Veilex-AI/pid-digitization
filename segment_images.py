@@ -9,7 +9,7 @@ from config import config
 
 def create_dataset_data_segments(chuck_size: int):
     """
-        create small segments of each and every datapoint image and save them back in a different path.
+        create small segments of each and every datapoint image and save them back in a different path alogside their filtered annoations in YOLO based text format.
     """
     data_converter_service = DataConverterService()
     datapoints = data_converter_service.load_dataset()
