@@ -24,6 +24,7 @@ class PredictSymbolsService:
     def predict_bounding_boxes(self) -> List[Tuple[Tuple[float, float, float, float], str]]:
         """
             identify the symbols through bounding boxes (x1, x2, y1, y2) using a pretrained YOLO model. 
+            update: use the window shift method (remove this bracket comment if this is completed )
         """
         if(self.model is None): self.load_model()
 

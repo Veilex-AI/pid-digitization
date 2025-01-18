@@ -52,4 +52,4 @@ def create_dataset_data_segments(chuck_size: int):
                     
 
 if __name__ == "__main__":
-    create_dataset_data_segments(2160)
+    create_dataset_data_segments(1088)
