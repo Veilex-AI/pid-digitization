@@ -9,6 +9,7 @@ from src.utils.calculate_distance_between_points import calculate_distance_betwe
 
 class LineDetectionService:
     image_path: str = ""
+    # the bounding boxes are used to clean the symbols and the words that are present in the document.
     bounding_boxes: List[BoundingBox] = []
     line_padding: float = 8
     line_thickness: float = 2
