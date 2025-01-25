@@ -15,9 +15,9 @@ class PredictSymbolsService:
     image_path: str = ""
     model: YOLO = None
 
-    def __init__(self, image_path: str = ""):
+    def __init__(self, image_path: str = "", model_path: str = ""):
         self.image_path = image_path
-        self.model_path = config.model_path
+        self.model_path = model_path if model_path is not None else config.model_path
 
     def get_image(self) -> ImageFile:
         """
@@ -25,7 +25,7 @@ class PredictSymbolsService:
         """
         return Image.open(self.image_path)
 
-    def predict_bounding_boxes(self) -> List[Tuple[Tuple[float, float, float, float], str]]:
+    def predict_bounding_boxes(self, shifting=False) -> List[Tuple[Tuple[float, float, float, float], str]]:
         """
             identify the symbols through bounding boxes (x1, x2, y1, y2) using a pretrained YOLO model. 
             update: use the window shift method (remove this bracket comment if this is completed )
@@ -36,7 +36,7 @@ class PredictSymbolsService:
         start = time.time()
 
         total_bounding_boxes_with_shifts = []
-        for shift in range(0, 500, 100):
+        for shift in range(0, 500, 200 if shifting else 500):
             dimensions = segment_image_dimensions(
                 image=self.get_image(),
                 chunk_size=1088,
