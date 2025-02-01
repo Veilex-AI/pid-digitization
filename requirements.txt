@@ -7,3 +7,15 @@ pydantic-settings==2.7.0
 matplotlib==3.10.0
 networkx==3.4.2
 shapely==2.0.6
+annotated-types==0.7.0
+anyio==4.8.0
+beanie==1.28.0
+fastapi==0.115.6
+lazy-model==0.2.0
+motor==3.6.0
+pillow==11.1.0
+pydantic==2.10.4
+pydantic_core==2.27.2
+pymongo==4.9.2
+typing_extensions==4.12.2
+uvicorn==0.34.0
