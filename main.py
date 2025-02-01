@@ -36,7 +36,7 @@ app.add_middleware(
 )
 
 
-app.include_router(pid_router, prefix="", tags=["floorplan"])
+app.include_router(pid_router, prefix="")
 
 
 if __name__ == "__main__":
