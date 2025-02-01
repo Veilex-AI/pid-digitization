@@ -41,7 +41,7 @@ class GraphConstructionService:
 
         for symbol in self.symbols:
             node_id = symbol.name
-            graph.add_node(node_id, type=GraphNodeType.symbol)
+            graph.add_node(node_id, type=GraphNodeType.symbol, label=symbol.label)
 
         self.graph = graph
 
@@ -152,5 +152,63 @@ class GraphConstructionService:
         largest_component = max(connected_components, key=len)
         self.graph = self.graph.subgraph(largest_component).copy()
     
+    def line_node_to_edges(self):
+        # get all the symbol nodes
+        symbol_and_connector_nodes = [node for node, data in self.graph.nodes(data=True) if data['type'] in [GraphNodeType.connector, GraphNodeType.symbol]]
+        node_to_node_paths = []
+        for u in symbol_and_connector_nodes:
+            for v in symbol_and_connector_nodes:
+                if u != v:
+                    # push only those links to array that have symbols at boths ends.
+                    for path in list(nx.all_simple_paths(self.graph, source=u, target=v)):
+                        all_lines = path[1: -1]
+                        if len(all_lines) > 1 and all(self.graph.nodes[l]['type'] == GraphNodeType.line for l in all_lines):
+                            valid_path = True
+                            for i in range(1, len(path) - 1):
+                                neighbors = list(self.graph.neighbors(path[i]))
+                                if not all(neighbor in [path[i-1], path[i+1]] for neighbor in neighbors):
+                                    valid_path = False
+                                    break
+                            if valid_path:
+                                node_to_node_paths.append(path)
+
+        node_to_node_paths = self.uniqify_paths(self.graph, node_to_node_paths)
+
+        for path in node_to_node_paths:
+            last_node = path[len(path) - 1]
+            first_line = path[1]
+            self.graph.add_edge(first_line, last_node)
+
+            for node in path[2:len(path) - 1]:
+                if self.graph.has_node(node): self.graph.remove_node(node)
+
+    def generate_graphml(self) -> str:
+        graph_copy = self.graph.copy()
+        for node in self.graph.nodes():
+            if graph_copy.nodes[node]['type'] == GraphNodeType.connector:
+                 graph_copy.nodes[node]['type'] = "connector"
+            elif graph_copy.nodes[node]['type'] == GraphNodeType.line:
+                graph_copy.nodes[node]['type'] = "line"
+            elif graph_copy.nodes[node]['type'] == GraphNodeType.symbol:
+                graph_copy.nodes[node]['type'] = "symbol"
+
+        
+        return '\n'.join(nx.generate_graphml(graph_copy))
+
+    # PRIVATE FUNCTION
+    def uniqify_paths(self, G, paths):
+        unique_paths = []
+        seen = []
+        
+        for path in paths:
+            subgraph = G.subgraph(path)
+            
+            # Check if it is isomorphic to any previously seen subgraph
+            if not any(nx.is_isomorphic(subgraph, G.subgraph(seen_path)) for seen_path in seen):
+                seen.append(path)
+                unique_paths.append(path)
+        
+        return unique_paths
+
     def get_line_nodes(self):
         return {node for node, data in self.graph.nodes(data=True) if data.get('type') == GraphNodeType.line}

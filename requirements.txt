@@ -20,3 +20,4 @@ pymongo==4.9.2
 typing_extensions==4.12.2
 uvicorn==0.34.0
 python-multipart==0.0.20
+networkx==3.4.2

@@ -18,3 +18,4 @@ class PipingDocument(Document):
     digitalized: bool = False
     created_at: datetime
     updated_at: datetime
+    graphml_buffer: str = ""
