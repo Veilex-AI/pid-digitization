@@ -68,9 +68,11 @@ async def digitalize_pid_graph(
         print(f"a thread with pid {id} is already in progress")
         raise HTTPException(status_code=409, detail="A similar thread with the associated id is already running.")
     
-    task = asyncio.create_task(digitize_pid_document(id))
+    asyncio.create_task(between_callback(id))
+    
+    # task = asyncio.to_thread(digitize_pid_document(id))
 
-    thread_pid_jobs.append(id)
+    # thread_pid_jobs.append(task)
 
     return None
 
@@ -85,19 +87,26 @@ async def get_graph_based_xml(
 
 
 # PRIVATE FUNCTIONS
-# def between_callback(args):
-#     """
-#         used for running thread based applications.
-#     """
-#     thread_pid_jobs.append(args)
+async def between_callback(args):
+    """
+        running thread based pid processing.
+    """
 
-#     loop = asyncio.new_event_loop()
-#     asyncio.set_event_loop(loop)
+    thread_pid_jobs.append(args)
 
-#     loop.run_until_complete(digitize_pid_document(args))
-#     loop.close()
+    asyncio.to_thread(await digitize_pid_document(args))
+    
 
-#     thread_pid_jobs.remove(args)
+
+    # thread_pid_jobs.append(args)
+
+    # loop = asyncio.new_event_loop()
+    # asyncio.set_event_loop(loop)
+
+    # loop.run_until_complete(digitize_pid_document(args))
+    # loop.close()
+
+    # thread_pid_jobs.remove(args)
 
 
 
@@ -141,11 +150,6 @@ async def digitize_pid_document(id: str):
     pid_document.symbols = symbols
 
     await pid_document.save()
-
-
-    # get all lines from the document.
-
-    
 
     thread_pid_jobs.remove(id)
 
