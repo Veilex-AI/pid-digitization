@@ -14,6 +14,8 @@ class Config(BaseSettings):
         param monogo_uri: the uri of mongo db to connect to mongo no sql database.
         param db_name: the name of the database associated with the mongo server.
         param pid_upload_path: the dir where all pid documents will be uploaded via the API.
+        param azure_di_endpoint: url endpoint for azure document inteligence service
+        param azure_di_key: associaated key to access azure document inteliggence service
     """
     model_path: str
     upload_path: str
@@ -23,6 +25,8 @@ class Config(BaseSettings):
     mongo_uri: str
     db_name: str
     pid_upload_path: str
+    azure_di_endpoint: str
+    azure_di_key: str
 
 config = Config(
     model_path = os.getenv("MODEL_PATH"),
@@ -32,5 +36,7 @@ config = Config(
     annotation_dir_name = os.getenv("ANNOTATION_DIR_NAME"),
     mongo_uri = os.getenv("MONGO_URI"),
     db_name = os.getenv("DB_NAME"),
-    pid_upload_path = os.getenv("PID_UPLOAD_PATH")
+    pid_upload_path = os.getenv("PID_UPLOAD_PATH"),
+    azure_di_endpoint = os.getenv("AZURE_DI_ENDPONT"),
+    azure_di_key = os.getenv("AZURE_DI_KEY")
 )

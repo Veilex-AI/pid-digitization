@@ -81,6 +81,10 @@ class PredictSymbolsService:
 
     
     def group_closest_points(self, bounding_boxes: List[Tuple[List[int], str]], threshold: int) -> Dict[int, List[Tuple[List[int], str]]]:
+        """
+            put the closest bounding boxes to a single group.
+            return: a dict of group.
+        """
         groups = defaultdict(list)
         visited = set()
         group_id = 0
@@ -105,6 +109,9 @@ class PredictSymbolsService:
         return dict(groups)
         
     def filter_largest_bbox_area(self, bbox_groups: Dict[int, Tuple[List[int], str]]) -> Tuple[List[int], str]:
+        """
+            Select the largest bbox area from every group
+        """
         new_bounding_box_array = []
 
         def calculate_bbox_area(bbox):
