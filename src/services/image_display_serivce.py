@@ -1,8 +1,9 @@
+import matplotlib.pyplot as plt
+import networkx as nx
 from typing import List
 from PIL import Image, ImageFile
-import matplotlib.pyplot as plt
-from src.models.bounding_box import BoundingBox
-import networkx as nx
+
+from src.models import BoundingBox
 
 class ImageDisplayService:
     image_path: str = ""
@@ -37,7 +38,6 @@ class ImageDisplayService:
             rect = plt.Rectangle((x1, y1), width, height, fill=False, edgecolor=color, linewidth=0.2)
             ax.add_patch(rect)
             ax.text(x1 + 8, y1 - 2, bbox.name, bbox=dict(facecolor=color, alpha=0.5, boxstyle="round,pad=0.2"), fontsize=8, color='white')
-            # ax.text(x1 + 8, y1 - 2, bbox=dict(facecolor=color, alpha=0.5, boxstyle="round,pad=0.2"), fontsize=8, color='white')
 
         plt.axis('off')
         plt.show()

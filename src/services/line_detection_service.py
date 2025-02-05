@@ -1,11 +1,11 @@
 import math
-from typing import List
 import cv2
 import numpy as np
 from shapely.geometry import Point
-from src.models.bounding_box import BoundingBox
-from src.utils.get_slope_between_points import get_slope_between_points
-from src.utils.calculate_distance_between_points import calculate_distance_between_points
+from typing import List
+
+from src.models import BoundingBox
+from src.utils import get_slope_between_points, calculate_distance_between_points
 
 class LineDetectionService:
     image_path: str = ""
@@ -23,9 +23,6 @@ class LineDetectionService:
         """
             get the image in OpenCV compatible format.
         """
-        # kind of deprecated piece of code. this is not required now.
-        # if not self.image_path:
-        #     return cv2.cvtColor(np.array(self.image_pil), cv2.COLOR_RGB2BGR)
         return cv2.imread(self.image_path)
         
 

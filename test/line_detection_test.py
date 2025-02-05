@@ -1,8 +1,6 @@
 # %%
-from src.services.data_converter_service import DataConverterService
-from src.utils.convert_points_to_bounding_box import convert_points_to_bounding_box
-from src.services.line_detection_service import LineDetectionService
-from src.services.image_display_serivce import ImageDisplayService
+from src.services import DataConverterService, LineDetectionService, ImageDisplayService
+from src.utils import convert_points_to_bounding_box
 
 
 def detect_line_segments():

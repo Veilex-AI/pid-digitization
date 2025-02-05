@@ -5,18 +5,12 @@ from typing import List
 from uuid import uuid4
 from fastapi import APIRouter, File, HTTPException, UploadFile
 from PIL import Image
-from config import config
 
-from src.models.bounding_box import BoundingBox
-from src.services.predict_word_service import PredictWordService
-from src.services.graph_construction_service import GraphConstructionService
-from src.models.line import Line
-from src.services.line_detection_service import LineDetectionService
-from src.models.vertex import Vertex
-from src.models.symbol import Symbol
-from src.services.predict_symbols_service import PredictSymbolsService
+from src.models import BoundingBox, Vertex, Symbol
+from src.services import PredictWordService, GraphConstructionService, LineDetectionService, PredictSymbolsService
 from src.repository import pid_repository
-from src.utils.convert_points_to_bounding_box import convert_points_to_bounding_box
+from src.utils import convert_points_to_bounding_box
+from config import config
 
 # key-value pair document.id: thread_id
 thread_pid_jobs = []
@@ -80,7 +74,9 @@ async def digitalize_pid_graph(
         print(f"a thread with pid {id} is already in progress")
         raise HTTPException(status_code=409, detail="A similar thread with the associated id is already running.")
     
-    asyncio.create_task(between_callback(id))
+    # asyncio.create_task(digitize_pid_document(id))
+
+    await digitize_pid_document(id)
     
     return None
 
@@ -184,8 +180,9 @@ async def digitize_pid_document(id: str):
         graph_service.remove_single_connection_line_nodes()
 
     # optimize this part.
-    for _ in range(10):
-        graph_service.line_node_to_edges()
+    # this has very high complexity, we forgo this for now.
+    # for _ in range(10):
+    #     graph_service.line_node_to_edges()
 
     graphml_result = graph_service.generate_graphml()
 
@@ -193,5 +190,3 @@ async def digitize_pid_document(id: str):
     pid_document.digitalized = True
 
     await pid_document.save()
-
-    thread_pid_jobs.remove(id)

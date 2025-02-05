@@ -1,5 +1,6 @@
 from pydantic import BaseModel
-from src.models.vertex import Vertex
+
+from .vertex import Vertex
 
 class BoundingBox(BaseModel):
     """

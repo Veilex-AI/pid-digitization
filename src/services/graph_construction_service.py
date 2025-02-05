@@ -1,17 +1,14 @@
 import networkx as nx
 from networkx import Graph
 
-from src.enums.graph_node_type import GraphNodeType
-from src.models.bounding_box import BoundingBox
-from src.models.symbol import Symbol
-
-from src.utils.bounding_box_to_polygon import bounding_box_to_polygon
-
+from src.enums import GraphNodeType
+from src.models import BoundingBox, Symbol
+from src.utils import bounding_box_to_polygon
 
 class GraphConstructionService:
     """
         A graph service responsible for graph management.
-        Utalized to create, modify, prune the graph alongside other functionalities.
+        Utilized to create, modify, prune the graph alongside other functionalities.
     """
 
     graph: Graph = None
@@ -152,6 +149,7 @@ class GraphConstructionService:
         largest_component = max(connected_components, key=len)
         self.graph = self.graph.subgraph(largest_component).copy()
     
+    # thie function has a huge time complexity and thus is slow for large nodes.
     def line_node_to_edges(self):
         # get all the symbol nodes
         symbol_and_connector_nodes = [node for node, data in self.graph.nodes(data=True) if data['type'] in [GraphNodeType.connector, GraphNodeType.symbol]]
@@ -195,7 +193,7 @@ class GraphConstructionService:
         
         return '\n'.join(nx.generate_graphml(graph_copy))
 
-    # PRIVATE FUNCTION
+    # PRIVATE FUNCTIONS
     def uniqify_paths(self, G, paths):
         unique_paths = []
         seen = []

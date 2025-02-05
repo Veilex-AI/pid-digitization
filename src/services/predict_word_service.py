@@ -6,8 +6,7 @@ from azure.ai.documentintelligence import DocumentIntelligenceClient
 from azure.ai.documentintelligence.models import AnalyzeDocumentRequest
 from PIL import Image
 
-from src.utils import pil_image_to_byte
-from src.utils import azure_polygon_to_bbox
+from src.utils import pil_image_to_byte, azure_polygon_to_bbox
 
 class PredictWordService:
 
