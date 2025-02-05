@@ -7,6 +7,8 @@ from fastapi import APIRouter, File, HTTPException, UploadFile
 from PIL import Image
 from config import config
 
+from src.models.bounding_box import BoundingBox
+from src.services.predict_word_service import PredictWordService
 from src.services.graph_construction_service import GraphConstructionService
 from src.models.line import Line
 from src.services.line_detection_service import LineDetectionService
@@ -106,7 +108,6 @@ async def digitize_pid_document(id: str):
     image_path = f"{config.pid_upload_path}/{pid_document.image_name}"
 
     # get all symbols from the document.
-
     model_path="./yolo-model-pid.pt"
     predict_symbol_service = PredictSymbolsService(
         image_path=image_path,
@@ -131,13 +132,32 @@ async def digitize_pid_document(id: str):
 
     pid_document.symbols = symbols
 
+    # get word bounding box from the document.
+    predict_word_service = PredictWordService(
+        image_path=image_path
+    )
+    word_prediction = predict_word_service.predicit_bounding_boxes()
+
+    words_bbox: List[BoundingBox] = []
+    for index, w_bbox in enumerate(word_prediction):
+        [x, y, _x, _y] = w_bbox
+        words_bbox.append(
+            BoundingBox(
+                name=f"w-{index}",
+                pointSrc=Vertex(x=x, y=y),
+                pointDest=Vertex(x=_x, y=_y)
+            )
+        )
+    
+    pid_document.words = words_bbox
+
     await pid_document.save()
 
 
     # get all lines from the document
     line_detection_service = LineDetectionService(
         image_path=image_path,
-        bounding_boxes=[*symbols]
+        bounding_boxes=[*symbols, *words_bbox]
     )
     line_segments = [convert_points_to_bounding_box(l) for l in line_detection_service.extend_lines(
         line_detection_service.detect_line_segments(enable_thining=True)

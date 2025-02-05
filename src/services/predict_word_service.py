@@ -22,7 +22,7 @@ class PredictWordService:
             creates document inteligence client.
         """
         return DocumentIntelligenceClient(
-            endpoint=self.service_endpoint, credential=AzureKeyCredential(self.service_key)
+            endpoint=self.azure_endpoint, credential=AzureKeyCredential(self.azure_key)
         )
     
     def get_image(self):
@@ -31,7 +31,7 @@ class PredictWordService:
         """
         return Image.open(self.image_path)
 
-    def predicit_bounding_boxes(self) -> List[Tuple[float, float, float, float]]:
+    def predicit_bounding_boxes(self) -> List[List[float]]:
         """
             identify the words in the PID by using azure document inteligence service. 
         """
@@ -39,7 +39,10 @@ class PredictWordService:
             raise ValueError("Azure service client is not defined")
         
         # normal PIL image converted to a buffer.
-        image_bytes = pil_image_to_byte(self.get_image())
+        print(
+            self.image_path.split(".")[-1]
+        )
+        image_bytes = pil_image_to_byte(self.get_image(), self.image_path.split(".")[-1])
         
         start = time.time()
         document = self.client.begin_analyze_document(
