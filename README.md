@@ -26,6 +26,7 @@ https://www.notion.so/Thesis-Extracting-Semantic-Relationship-from-visual-diagra
 - **Displaying Image**: Responsible for displaying bounding boxes images and graph based images using matplot lib library.
 - **Graph Construction**: A Graph management class that uses techniques to create graph and removes all redundiences in the graph structure.
 - **Crop Image**: Crops the image with desired dimensions. ability to filter and adjusts the annotations vertcies that are within the provided dimensions of the image. Moreover, can save the crop result back to its upload path.  
+- **Word Prediction**: Predicts the word bounding boxes in the image by using azure document inteligence. A key and endpoint is required for this service to work.
 
 
 #### Purpose of the config file
@@ -47,8 +48,10 @@ Some other files have been designed to test the service features either independ
 
 
 #### Future Tasks
-- Features to be built around a FastAPI model which will make testing different parts of the application easier. This will allow easier integration with other systems that want to use these features as plugin modules.
-- The PID documents do not have any graph annotations, which means they need to be created. Create graph annotations to test if the annotation created by your program is accurate, eventhough the graph that is created is not created through an ML model.
+- Features to be built around FastAPI which will make testing easier.✅
+- Implement the functionality of download yolo model from google drive. usage of credentials and token is required to achive this task. 
+- The PID documents do not have any graph annotations. Create graph annotations to test if the annotation created by the program is accurate. ⏳
+- Merge the verticle or horizontal lines that are intersecting with each other. ⏳
 
 <br>
 
