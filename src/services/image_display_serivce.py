@@ -20,7 +20,7 @@ class ImageDisplayService:
         """
         return Image.open(self.image_path)
     
-    def display_image_with_bbox(self, color='red', dpi=200) -> None:
+    def display_image_with_bbox(self, color='red', dpi=200, show_text=True) -> None:
         """
             displays image using matplot lib
         """
@@ -37,7 +37,8 @@ class ImageDisplayService:
 
             rect = plt.Rectangle((x1, y1), width, height, fill=False, edgecolor=color, linewidth=0.2)
             ax.add_patch(rect)
-            ax.text(x1 + 8, y1 - 2, bbox.name, bbox=dict(facecolor=color, alpha=0.5, boxstyle="round,pad=0.2"), fontsize=8, color='white')
+            if(show_text):
+                ax.text(x1 + 8, y1 - 2, bbox.name, bbox=dict(facecolor=color, alpha=0.5, boxstyle="round,pad=0.2"), fontsize=8, color='white')
 
         plt.axis('off')
         plt.show()

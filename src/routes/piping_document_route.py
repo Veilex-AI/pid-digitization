@@ -173,16 +173,14 @@ async def digitize_pid_document(id: str):
     graph_service.define_graph_edges()
 
     graph_service.reduce_line_cycles()
-    # graph_service.set_largest_graph_connected_nodes()
 
     # optimize this part.
     for _ in range(100):
-        graph_service.remove_single_connection_line_nodes()
+        graph_service.remove_zero_or_single_connection_line_nodes()
 
-    # optimize this part.
-    # this has very high complexity, we forgo this for now.
-    # for _ in range(10):
-    #     graph_service.line_node_to_edges()
+    graph_service.prune_multiple_path_nodes(
+        graph_service.find_valid_paths()
+    )
 
     graphml_result = graph_service.generate_graphml()
 

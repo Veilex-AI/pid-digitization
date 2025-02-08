@@ -38,9 +38,6 @@ class PredictWordService:
             raise ValueError("Azure service client is not defined")
         
         # normal PIL image converted to a buffer.
-        print(
-            self.image_path.split(".")[-1]
-        )
         image_bytes = pil_image_to_byte(self.get_image(), self.image_path.split(".")[-1])
         
         start = time.time()
