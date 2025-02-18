@@ -1,11 +1,13 @@
 import math
 import cv2
 import numpy as np
+from shapely import LineString, Polygon
 from shapely.geometry import Point
 from typing import List
 
 from src.models import BoundingBox
-from src.utils import get_slope_between_points, calculate_distance_between_points
+from src.utils import get_slope_between_points, calculate_distance_between_points, bounding_box_to_polygon
+from shapely.ops import linemerge
 
 class LineDetectionService:
     image_path: str = ""
@@ -24,7 +26,6 @@ class LineDetectionService:
             get the image in OpenCV compatible format.
         """
         return cv2.imread(self.image_path)
-        
 
     def detect_line_segments(self, enable_thining=True):
         preprocessed_image = self.pre_process_image(enable_thining)
@@ -38,7 +39,6 @@ class LineDetectionService:
 
         return [ ls[0] for ls in line_segments ]
         
-    
     def pre_process_image(self, enable_thining=False):
         """
             pre process the image before the lines can be detected. makes the image black and white by removing the RGB vlaues.
@@ -142,6 +142,41 @@ class LineDetectionService:
 
         return extended_line_segments
     
+    def merge_lines(self, line_segments = []):
+        """
+            Merge the lines if they intersect, have the same slope, and are adjacent.
+        """
+        merged_lines = []
+        i = 0
+        while i < len(line_segments):
+            current_line = line_segments[i]
+            j = i + 1
+            while j < len(line_segments):
+                x1, y1, _x1, _y1 = line_segments[i]
+                x2, y2, _x2, _y2 = line_segments[j]
+                current_line = bounding_box_to_polygon(x1, y1, _x1, _y1)
+                next_line = bounding_box_to_polygon(x2, y2, _x2, _y2)
+
+                def thick_line_slope(x1, y1, x2, y2):
+                    width = abs(x2 - x1)
+                    height = abs(y2 - y1)
+
+                    return 0 if width > height else float('inf')
+
+                if current_line.intersects(next_line) and thick_line_slope(x1, y1, _x1, _y1) == thick_line_slope(x2, y2, _x2, _y2):
+                    merged_polygon = current_line.union(next_line).envelope
+                    current_line = merged_polygon
+                    line_segments.pop(j)
+                    j -= 1
+                    # merged_intersections.append((i, j))
+
+                    print(i, j)
+                j += 1
+            merged_lines.append(current_line)
+            i += 1
+
+        return merged_lines
+
     def get_line_padding(self, startX, startY, endX, endY, multiplier = 2):
         """
             increase the padding with a multiplier if the line is too short.

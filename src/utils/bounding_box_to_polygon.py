@@ -1,6 +1,6 @@
-from shapely import Polygon
+from shapely import LineString, Polygon
 
-def bounding_box_to_polygon(topX, topY, bottomX, bottomY):
+def bounding_box_to_polygon(topX, topY, bottomX, bottomY, type = "Polygon"):
     '''Converts a bounding box to coordinates.
 
     :param bounding_box: The bounding box.
@@ -13,5 +13,10 @@ def bounding_box_to_polygon(topX, topY, bottomX, bottomY):
         (bottomX, bottomY),
         (topX, bottomY)
     )
-    polygon = Polygon(coords)
+    polygon = None
+
+    if type == "LineString":
+        polygon = LineString(coords)
+    else:
+        polygon = Polygon(coords)
     return polygon
