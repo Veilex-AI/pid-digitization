@@ -48,7 +48,7 @@ class ImageDisplayService:
             displays a graph in matplotlib with nx support.
         """
         plt.clf()
-        plt.figure(figsize=(8, 6))
+        plt.figure(figsize=(15, 15))
         nx.draw(graph, with_labels=True, node_size=node_size, node_color="lightgreen", font_size=10, font_weight="bold")
         plt.title("Undirected Graph")
         plt.show()

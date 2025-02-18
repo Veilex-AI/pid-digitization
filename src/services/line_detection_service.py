@@ -1,3 +1,4 @@
+from collections import defaultdict
 import math
 import cv2
 import numpy as np
@@ -146,10 +147,44 @@ class LineDetectionService:
         """
             Merge the lines if they intersect, have the same slope, and are adjacent.
         """
-        merged_lines = []
+        connected_components = self.find_intersections_to_merge(
+            self.find_merge_intersections(line_segments)
+        )
+
+        merged_polygons = []
+        for connect_indexs in connected_components:
+            x, y, _x, _y = line_segments[connect_indexs[0]]
+            polygon = bounding_box_to_polygon(x, y, _x, _y)
+            for con_index in connect_indexs[1:]:
+                x, y, _x, _y = line_segments[con_index]
+                new_polygon = bounding_box_to_polygon(x, y, _x, _y)
+                polygon = polygon.union(new_polygon)
+            polygon = polygon.envelope
+            merged_polygons.append(polygon.bounds)
+
+        index_to_delete = []
+        for connect in connected_components:
+            for c in connect:
+                index_to_delete.append(c)
+
+        return [*[item for i, item in enumerate(line_segments) if i not in index_to_delete], *merged_polygons]
+
+    def get_line_padding(self, startX, startY, endX, endY, multiplier = 2):
+        """
+            increase the padding with a multiplier if the line is too short.
+        """
+        distance = calculate_distance_between_points((startX, startY), (endX, endY))
+        if distance < 40:
+            return self.line_padding * multiplier
+        return self.line_padding
+
+    def find_merge_intersections(self, line_segments = []):
+        """
+            see which lines can be merged a.
+        """
+        merged_intersections = []
         i = 0
         while i < len(line_segments):
-            current_line = line_segments[i]
             j = i + 1
             while j < len(line_segments):
                 x1, y1, _x1, _y1 = line_segments[i]
@@ -164,24 +199,39 @@ class LineDetectionService:
                     return 0 if width > height else float('inf')
 
                 if current_line.intersects(next_line) and thick_line_slope(x1, y1, _x1, _y1) == thick_line_slope(x2, y2, _x2, _y2):
-                    merged_polygon = current_line.union(next_line).envelope
-                    current_line = merged_polygon
-                    line_segments.pop(j)
-                    j -= 1
-                    # merged_intersections.append((i, j))
-
-                    print(i, j)
+                    merged_intersections.append((i, j))
                 j += 1
-            merged_lines.append(current_line)
             i += 1
 
-        return merged_lines
+        return merged_intersections
+    
+    def find_intersections_to_merge(self, merged_lines_index):
+        intersections = merged_lines_index
 
-    def get_line_padding(self, startX, startY, endX, endY, multiplier = 2):
-        """
-            increase the padding with a multiplier if the line is too short.
-        """
-        distance = calculate_distance_between_points((startX, startY), (endX, endY))
-        if distance < 40:
-            return self.line_padding * multiplier
-        return self.line_padding
+        adj_list = defaultdict(set)
+        for a, b in intersections:
+            adj_list[a].add(b)
+            adj_list[b].add(a)
+
+        def find_connected_components(adj_list):
+            visited = set()
+            components = []
+
+            def dfs(node, component):
+                stack = [node]
+                while stack:
+                    curr = stack.pop()
+                    if curr not in visited:
+                        visited.add(curr)
+                        component.append(curr)
+                        stack.extend(adj_list[curr] - visited)
+
+            for node in adj_list:
+                if node not in visited:
+                    component = []
+                    dfs(node, component)
+                    components.append(sorted(component))  # Sort for consistency
+
+            return components
+
+        return find_connected_components(adj_list)
