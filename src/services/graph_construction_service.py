@@ -275,6 +275,15 @@ class GraphConstructionService:
                     G.add_edge(neighbors[0], neighbors[1])
                 G.remove_node(node)
 
+    def remove_connected_line_nodes(self):
+        """
+            delete node connection whose all nodes are of type line.
+        """
+        connections = list(nx.connected_components(self.graph))
+        for connection in connections:
+            if all([True if self.graph.nodes[item]['type'] == GraphNodeType.line else False for item in list(connection)]):
+                self.graph.remove_nodes_from(connection)
+
     # PRIVATE FUNCTIONS
     def uniqify_paths(self, G, paths):
         unique_paths = []

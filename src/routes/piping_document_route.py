@@ -109,7 +109,10 @@ async def digitize_pid_document(id: str):
         image_path=image_path,
         model_path=model_path
     )
-    prediction_results = predict_symbol_service.predict_bounding_boxes()
+
+    w,h = predict_symbol_service.get_image().size
+
+    prediction_results = predict_symbol_service.predict_bounding_boxes(shifting=(True if w > 1088 and h > 1088 else False))
 
     symbols: List[Symbol] = []
     for index, pr in enumerate(prediction_results):
@@ -155,9 +158,14 @@ async def digitize_pid_document(id: str):
         image_path=image_path,
         bounding_boxes=[*symbols, *words_bbox]
     )
-    line_segments = [convert_points_to_bounding_box(l) for l in line_detection_service.extend_lines(
-        line_detection_service.detect_line_segments(enable_thining=True)
-    )]
+
+    line_segments = [
+        convert_points_to_bounding_box(l) for l in line_detection_service.merge_lines(
+            line_segments = line_detection_service.extend_lines(
+                line_detection_service.detect_line_segments(enable_thining=True)       
+            )
+        )
+    ]
 
     for index, l in enumerate(line_segments):
         l.name = f"l-{str(index)}"
@@ -173,14 +181,17 @@ async def digitize_pid_document(id: str):
     graph_service.define_graph_edges()
 
     graph_service.reduce_line_cycles()
+    graph_service.remove_connected_line_nodes()
 
     # optimize this part.
     for _ in range(100):
         graph_service.remove_zero_or_single_connection_line_nodes()
 
-    graph_service.prune_multiple_path_nodes(
-        graph_service.find_valid_paths()
-    )
+    # not needed anymore
+    # the reason for using this function was to remove redundent line nodes but now it has handled by merging the same slope based lines which is taken care via the cartesian based operation that comes before any graph operations.
+    # graph_service.prune_multiple_path_nodes(
+    #     graph_service.find_valid_paths()
+    # )
 
     graphml_result = graph_service.generate_graphml()
 

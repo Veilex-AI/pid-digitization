@@ -195,7 +195,6 @@ class LineDetectionService:
                 def thick_line_slope(x1, y1, x2, y2):
                     width = abs(x2 - x1)
                     height = abs(y2 - y1)
-
                     return 0 if width > height else float('inf')
 
                 if current_line.intersects(next_line) and thick_line_slope(x1, y1, _x1, _y1) == thick_line_slope(x2, y2, _x2, _y2):

@@ -16,9 +16,7 @@ async def lifespan(app: FastAPI):
     await connect_database()
     yield
 
-
 app = FastAPI(lifespan=lifespan)
-
 
 # only used for development mode
 app.add_middleware(
@@ -29,9 +27,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 app.include_router(pid_router, prefix="")
-
 
 if __name__ == "__main__":
     import uvicorn

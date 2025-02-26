@@ -37,6 +37,6 @@ config = Config(
     mongo_uri = os.getenv("MONGO_URI"),
     db_name = os.getenv("DB_NAME"),
     pid_upload_path = os.getenv("PID_UPLOAD_PATH"),
-    azure_di_endpoint = os.getenv("AZURE_DI_ENDPONT"),
+    azure_di_endpoint = os.getenv("AZURE_DI_ENDPOINT"),
     azure_di_key = os.getenv("AZURE_DI_KEY")
 )
