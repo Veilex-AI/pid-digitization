@@ -49,9 +49,9 @@ Some other files have been designed to test the service features either independ
 
 #### Future Tasks
 - Features to be built around FastAPI which will make testing easier.✅
-- Implement the functionality of download yolo model from google drive. usage of credentials and token is required to achive this task. 
+- Implement the functionality of downloading yolo model from google drive. usage of credentials and token is required to achive this task. ✅ 
 - The PID documents do not have any graph annotations. Create graph annotations to test if the annotation created by the program is accurate. ⏳
-- Merge the verticle or horizontal lines that are intersecting with each other. ⏳
+- Merge the verticle or horizontal lines that are intersecting with each other. ✅
 
 <br>
 
