@@ -1,10 +1,7 @@
-from pydantic_settings import BaseSettings 
 import os
-from dotenv import load_dotenv
+from pydantic_settings import BaseSettings, SettingsConfigDict 
 
-load_dotenv()
-
-class Config(BaseSettings):
+class Settings(BaseSettings):
     """
         param model_path: the path of YOLO model. used for symbol detection.
         param upload_path: the path where additional data can be uploaded.
@@ -28,15 +25,11 @@ class Config(BaseSettings):
     azure_di_endpoint: str
     azure_di_key: str
 
-config = Config(
-    model_path = os.getenv("MODEL_PATH"),
-    upload_path = os.getenv("UPLOAD_PATH"),
-    dataset_path = os.getenv("DATASET_PATH"),
-    image_dir_name = os.getenv("IMAGE_DIR_NAME"),
-    annotation_dir_name = os.getenv("ANNOTATION_DIR_NAME"),
-    mongo_uri = os.getenv("MONGO_URI"),
-    db_name = os.getenv("DB_NAME"),
-    pid_upload_path = os.getenv("PID_UPLOAD_PATH"),
-    azure_di_endpoint = os.getenv("AZURE_DI_ENDPOINT"),
-    azure_di_key = os.getenv("AZURE_DI_KEY")
-)
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        env_ignore_empty=True,
+        populate_by_name=True
+    )
+
+config = Settings()
