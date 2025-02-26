@@ -6,6 +6,7 @@ from uuid import uuid4
 from fastapi import APIRouter, File, HTTPException, UploadFile
 from PIL import Image
 
+from src.exceptions import EmptyLineOrSymbolError
 from src.models import BoundingBox, Vertex, Symbol
 from src.services import PredictWordService, GraphConstructionService, LineDetectionService, PredictSymbolsService
 from src.repository import pid_repository
@@ -74,11 +75,11 @@ async def digitalize_pid_graph(
         print(f"a thread with pid {id} is already in progress")
         raise HTTPException(status_code=409, detail="A similar thread with the associated id is already running.")
     
-    # asyncio.create_task(digitize_pid_document(id))
+    graphml_result = await digitize_pid_document(id)
 
-    await digitize_pid_document(id)
-    
-    return None
+    return {
+        "graphml_str": graphml_result
+    }
 
 
 # PRIVATE FUNCTIONS
@@ -98,8 +99,8 @@ async def digitize_pid_document(id: str):
     pid_document = await pid_repository.find_pid_document_by_id(id)
 
     if(pid_document is None):
-        # should use a logger here btw. a better way to program.
-        print(f"pid document with associated id {pid_document.id} Not found")
+        # print(f"pid document with associated id {pid_document.id} Not found")
+        raise HTTPException(status_code=404, detail=f"pid document with id {pid_document.id} Not found")
 
     image_path = f"{config.pid_upload_path}/{pid_document.image_name}"
 
@@ -112,6 +113,10 @@ async def digitize_pid_document(id: str):
 
     w,h = predict_symbol_service.get_image().size
 
+    """
+        1088 is the size of the image that the model accepts.
+        if the provided image is larger, it reduces the image to the following size.
+    """
     prediction_results = predict_symbol_service.predict_bounding_boxes(shifting=(True if w > 1088 and h > 1088 else False))
 
     symbols: List[Symbol] = []
@@ -175,11 +180,15 @@ async def digitize_pid_document(id: str):
     await pid_document.save()
 
     # construct a graph based on symbols and lines.
-
-    graph_service = GraphConstructionService(symbols=symbols, line_segments=line_segments)
-    graph_service.initialize_graph()
+    graph_service = None
+    try:
+        graph_service = GraphConstructionService(symbols=symbols, line_segments=line_segments)
+    except EmptyLineOrSymbolError as e:
+        raise HTTPException(status_code=500, detail=e.message)
+    except:
+        raise Exception()
+    
     graph_service.define_graph_edges()
-
     graph_service.reduce_line_cycles()
     graph_service.remove_connected_line_nodes()
 
@@ -199,3 +208,5 @@ async def digitize_pid_document(id: str):
     pid_document.digitalized = True
 
     await pid_document.save()
+
+    return pid_document.graphml_buffer

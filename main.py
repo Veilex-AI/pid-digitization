@@ -6,11 +6,6 @@ from src.db import connect_database
 from src.routes import router as pid_router
 from config import config
 
-"""
-    TODO: before initializing the database and fast api server, ensure to load all the files first that are required to run this application.
-"""
-
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await connect_database()

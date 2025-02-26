@@ -2,6 +2,7 @@ from collections import deque
 import networkx as nx
 from networkx import Graph
 
+from src.exceptions import EmptyLineOrSymbolError
 from src.enums import GraphNodeType
 from src.models import BoundingBox, Symbol
 from src.utils import bounding_box_to_polygon
@@ -30,7 +31,7 @@ class GraphConstructionService:
         graph = nx.Graph()
 
         if(len(self.line_segments) == 0 or len(self.symbols) == 0):
-            raise Exception("no symbols or line segments are defined.")
+            raise EmptyLineOrSymbolError()
         
         for line in self.line_segments:
             node_id = line.name
