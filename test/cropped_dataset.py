@@ -1,10 +1,8 @@
 import os
-from src.models.symbol import Symbol
-from src.models.line import Line
-from src.services.crop_image_service import CropImageService
-from src.services.data_converter_service import DataConverterService
-from src.utils.convert_points_to_bounding_box import convert_points_to_bounding_box
 
+from src.models import Symbol, Line
+from src.services import CropImageService, DataConverterService
+from src.utils import convert_points_to_bounding_box
 from config import config
 
 """

@@ -5,18 +5,13 @@ from typing import List
 from uuid import uuid4
 from fastapi import APIRouter, File, HTTPException, UploadFile
 from PIL import Image
-from config import config
 
-from src.models.bounding_box import BoundingBox
-from src.services.predict_word_service import PredictWordService
-from src.services.graph_construction_service import GraphConstructionService
-from src.models.line import Line
-from src.services.line_detection_service import LineDetectionService
-from src.models.vertex import Vertex
-from src.models.symbol import Symbol
-from src.services.predict_symbols_service import PredictSymbolsService
+from src.exceptions import EmptyLineOrSymbolError
+from src.models import BoundingBox, Vertex, Symbol
+from src.services import PredictWordService, GraphConstructionService, LineDetectionService, PredictSymbolsService
 from src.repository import pid_repository
-from src.utils.convert_points_to_bounding_box import convert_points_to_bounding_box
+from src.utils import convert_points_to_bounding_box
+from config import config
 
 # key-value pair document.id: thread_id
 thread_pid_jobs = []
@@ -80,9 +75,11 @@ async def digitalize_pid_graph(
         print(f"a thread with pid {id} is already in progress")
         raise HTTPException(status_code=409, detail="A similar thread with the associated id is already running.")
     
-    asyncio.create_task(between_callback(id))
-    
-    return None
+    graphml_result = await digitize_pid_document(id)
+
+    return {
+        "graphml_str": graphml_result
+    }
 
 
 # PRIVATE FUNCTIONS
@@ -102,8 +99,8 @@ async def digitize_pid_document(id: str):
     pid_document = await pid_repository.find_pid_document_by_id(id)
 
     if(pid_document is None):
-        # should use a logger here btw. a better way to program.
-        print(f"pid document with associated id {pid_document.id} Not found")
+        # print(f"pid document with associated id {pid_document.id} Not found")
+        raise HTTPException(status_code=404, detail=f"pid document with id {pid_document.id} Not found")
 
     image_path = f"{config.pid_upload_path}/{pid_document.image_name}"
 
@@ -113,7 +110,14 @@ async def digitize_pid_document(id: str):
         image_path=image_path,
         model_path=model_path
     )
-    prediction_results = predict_symbol_service.predict_bounding_boxes()
+
+    w,h = predict_symbol_service.get_image().size
+
+    """
+        1088 is the size of the image that the model accepts.
+        if the provided image is larger, it reduces the image to the following size.
+    """
+    prediction_results = predict_symbol_service.predict_bounding_boxes(shifting=(True if w > 1088 and h > 1088 else False))
 
     symbols: List[Symbol] = []
     for index, pr in enumerate(prediction_results):
@@ -159,9 +163,14 @@ async def digitize_pid_document(id: str):
         image_path=image_path,
         bounding_boxes=[*symbols, *words_bbox]
     )
-    line_segments = [convert_points_to_bounding_box(l) for l in line_detection_service.extend_lines(
-        line_detection_service.detect_line_segments(enable_thining=True)
-    )]
+
+    line_segments = [
+        convert_points_to_bounding_box(l) for l in line_detection_service.merge_lines(
+            line_segments = line_detection_service.extend_lines(
+                line_detection_service.detect_line_segments(enable_thining=True)       
+            )
+        )
+    ]
 
     for index, l in enumerate(line_segments):
         l.name = f"l-{str(index)}"
@@ -171,21 +180,27 @@ async def digitize_pid_document(id: str):
     await pid_document.save()
 
     # construct a graph based on symbols and lines.
-
-    graph_service = GraphConstructionService(symbols=symbols, line_segments=line_segments)
-    graph_service.initialize_graph()
+    graph_service = None
+    try:
+        graph_service = GraphConstructionService(symbols=symbols, line_segments=line_segments)
+    except EmptyLineOrSymbolError as e:
+        raise HTTPException(status_code=500, detail=e.message)
+    except:
+        raise Exception()
+    
     graph_service.define_graph_edges()
-
     graph_service.reduce_line_cycles()
-    # graph_service.set_largest_graph_connected_nodes()
+    graph_service.remove_connected_line_nodes()
 
     # optimize this part.
     for _ in range(100):
-        graph_service.remove_single_connection_line_nodes()
+        graph_service.remove_zero_or_single_connection_line_nodes()
 
-    # optimize this part.
-    for _ in range(10):
-        graph_service.line_node_to_edges()
+    # not needed anymore
+    # the reason for using this function was to remove redundent line nodes but now it has handled by merging the same slope based lines which is taken care via the cartesian based operation that comes before any graph operations.
+    # graph_service.prune_multiple_path_nodes(
+    #     graph_service.find_valid_paths()
+    # )
 
     graphml_result = graph_service.generate_graphml()
 
@@ -194,4 +209,4 @@ async def digitize_pid_document(id: str):
 
     await pid_document.save()
 
-    thread_pid_jobs.remove(id)
+    return pid_document.graphml_buffer

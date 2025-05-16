@@ -1,7 +1,8 @@
 from beanie import init_beanie
 import motor
+
+from src.models.db import PipingDocument
 from config import config
-from src.models.db.piping_document import PipingDocument
 
 async def connect_database():
     global client

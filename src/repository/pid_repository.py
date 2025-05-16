@@ -1,9 +1,8 @@
-import datetime
-
 from beanie import WriteRules
 from bson import ObjectId
+import datetime
 
-from src.models.db.piping_document import PipingDocument
+from src.models.db import PipingDocument
 
 
 async def create_pid_document(

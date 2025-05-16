@@ -1,14 +1,12 @@
+import time
 from collections import defaultdict
 from typing import Dict, List, Tuple
 from config import config
-import time
 from ultralytics import YOLO
-from src.services.crop_image_service import CropImageService
-from src.utils.segment_image_dimensions import segment_image_dimensions
-from src.utils.calculate_distance_between_rectangles import calculate_distance_between_rectangles
-from src.utils.convert_points_to_bounding_box import convert_points_to_bounding_box
-from PIL import ImageFile, Image
 
+from src.services import CropImageService
+from src.utils import segment_image_dimensions, calculate_distance_between_rectangles, convert_points_to_bounding_box
+from PIL import ImageFile, Image
 
 class PredictSymbolsService:
     model_path: str
@@ -135,8 +133,6 @@ class PredictSymbolsService:
             initialize the YOLO model
         """
         self.model = YOLO(self.model_path)
-
-
 
 # class areas.
 # class_sizes = {'21': 1985, '2': 5415, '18': 6969, '26': 17849, '8': 7037, '20': 6110, '25': 6532, '32': 16411, '28': 17179, '7': 6771, '9': 6689, '12': 5510, '22': 5795, '24': 2808, '11': 6129, '23': 8645, '29': 17181, '4': 6132, '31': 16001, '5': 4808, '15': 3737, '17': 5721, '19': 6769, '30': 11940, '16': 3564, '13': 6558, '1': 4575, '6': 3126, '10': 8179, '27': 18761, '14': 13607, '3': 6903}

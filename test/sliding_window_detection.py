@@ -1,7 +1,6 @@
-from src.services.data_converter_service import DataConverterService
-from src.services.predict_symbols_service import PredictSymbolsService
 import math
 
+from src.services import DataConverterService, PredictSymbolsService
 
 def get_all_datapoints(dp_index = None):
     data_converter_service = DataConverterService()
@@ -54,14 +53,3 @@ class_sizes = {'21': 1985, '2': 5415, '18': 6969, '26': 17849, '8': 7037, '20': 
 
 sizes = get_class_sizes()
 print(remove_decimal_values(sizes))
-
-# make the prediciton optmized here. 
-
-# create all the segments first. then predict those segments. choose those predictions which are within the width and height of the class.
-# slide the segment side a little more to the left and right side.
-
-def create_segments():
-    pass
-
-def predict_segments():
-    pass

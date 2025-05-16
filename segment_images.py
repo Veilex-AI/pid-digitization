@@ -1,10 +1,8 @@
 import os
-from src.services.crop_image_service import CropImageService
-from src.services.data_converter_service import DataConverterService
-from src.utils.segment_image_dimensions import segment_image_dimensions
-from src.utils.convert_points_to_bounding_box import convert_points_to_bounding_box
-from src.utils.normalize_coordinates import normalize_coordinates
 from PIL import Image
+
+from src.services import CropImageService, DataConverterService
+from src.utils import segment_image_dimensions, convert_points_to_bounding_box, normalize_coordinates
 from config import config
 
 def create_dataset_data_segments(chuck_size: int):

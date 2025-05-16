@@ -6,10 +6,7 @@ from PIL import Image
 from PIL.ImageFile import ImageFile
 import numpy as np
 
-from src.models.line import Line
-from src.models.symbol import Symbol
-from src.models.bounding_box import BoundingBox
-
+from src.models import Line, Symbol, BoundingBox
 
 class CropImageService:
     """

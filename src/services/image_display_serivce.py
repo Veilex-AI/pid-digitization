@@ -1,8 +1,9 @@
+import matplotlib.pyplot as plt
+import networkx as nx
 from typing import List
 from PIL import Image, ImageFile
-import matplotlib.pyplot as plt
-from src.models.bounding_box import BoundingBox
-import networkx as nx
+
+from src.models import BoundingBox
 
 class ImageDisplayService:
     image_path: str = ""
@@ -19,7 +20,7 @@ class ImageDisplayService:
         """
         return Image.open(self.image_path)
     
-    def display_image_with_bbox(self, color='red', dpi=200) -> None:
+    def display_image_with_bbox(self, color='red', dpi=200, show_text=True) -> None:
         """
             displays image using matplot lib
         """
@@ -36,8 +37,8 @@ class ImageDisplayService:
 
             rect = plt.Rectangle((x1, y1), width, height, fill=False, edgecolor=color, linewidth=0.2)
             ax.add_patch(rect)
-            ax.text(x1 + 8, y1 - 2, bbox.name, bbox=dict(facecolor=color, alpha=0.5, boxstyle="round,pad=0.2"), fontsize=8, color='white')
-            # ax.text(x1 + 8, y1 - 2, bbox=dict(facecolor=color, alpha=0.5, boxstyle="round,pad=0.2"), fontsize=8, color='white')
+            if(show_text):
+                ax.text(x1 + 8, y1 - 2, bbox.name, bbox=dict(facecolor=color, alpha=0.5, boxstyle="round,pad=0.2"), fontsize=8, color='white')
 
         plt.axis('off')
         plt.show()
@@ -47,7 +48,7 @@ class ImageDisplayService:
             displays a graph in matplotlib with nx support.
         """
         plt.clf()
-        plt.figure(figsize=(8, 6))
+        plt.figure(figsize=(15, 15))
         nx.draw(graph, with_labels=True, node_size=node_size, node_color="lightgreen", font_size=10, font_weight="bold")
         plt.title("Undirected Graph")
         plt.show()

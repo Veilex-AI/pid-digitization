@@ -1,6 +1,5 @@
 from enum import Enum
 
-
 class GraphNodeType(str, Enum):
     '''Enum for the graph node types'''
     unknown = 'unknown'

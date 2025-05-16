@@ -1,11 +1,6 @@
-from src.models.bounding_box import BoundingBox
-from src.models.vertex import Vertex
-from src.services.crop_image_service import CropImageService
-from src.services.data_converter_service import DataConverterService
-from src.services.image_display_serivce import ImageDisplayService
-from src.services.line_detection_service import LineDetectionService
-from shapely.geometry import Point
-import math
+from src.models import BoundingBox, Vertex
+from src.services import CropImageService, DataConverterService, ImageDisplayService, LineDetectionService
+
 
 """
     DEPRECATED:

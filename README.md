@@ -1,12 +1,13 @@
 ### Overview
-This is a repository for managing the workflow of digitizing piping and instrumentation diagrams. Its primary function is to take an image and convert it into a graph data strcuture which is a machine readable format.
+This is a repository for managing the workflow of digitizing piping and instrumentation diagrams. Its primary function is to take an image and convert it into a XML graph data structure in machine readable format.
 
 #### How to execute the code.
 - prefered version of python is **3.12.8**
 - create a virtual environment: **python3 -m venv env**
 - activate the virtual environment: **.\env\Scripts\activate**
-- install all the packages in the environment: **.\env\Scripts\activate**
+- install all the packages from requirements.txt into the environment: **pip install -r requirements.txt**
 
+alternatively you could you also create a docker container to run the fast api service for testing the graph creation service.
 
 The source code of this repo is broken down into multiple folders.
 - **models**: provides class based attributes for other services to work on.
@@ -26,9 +27,10 @@ https://www.notion.so/Thesis-Extracting-Semantic-Relationship-from-visual-diagra
 - **Displaying Image**: Responsible for displaying bounding boxes images and graph based images using matplot lib library.
 - **Graph Construction**: A Graph management class that uses techniques to create graph and removes all redundiences in the graph structure.
 - **Crop Image**: Crops the image with desired dimensions. ability to filter and adjusts the annotations vertcies that are within the provided dimensions of the image. Moreover, can save the crop result back to its upload path.  
+- **Word Prediction**: Predicts the word bounding boxes in the image by using azure document inteligence. A key and endpoint is required for this service to work.
 
 
-#### Purpose of the config file
+#### Purpose of the config/env file
 The configuration file consists of imperative key-value pairs that need to be assigned for the source-code features to work succesfully.
 The config file consists of the following key-value pairs.
 
@@ -37,6 +39,13 @@ The config file consists of the following key-value pairs.
 - **DATASET_PATH**: The path where the entire dataset exist, which can be used for prediction and can be used for other testing purposes.
 - **IMAGE_DIR_NAME**: name of the folder, consisting of images, which is inside "DATASET_PATH"
 - **ANNOTATION_DIR_NAME**: name of the annotation folder, consisting of annotations, which is inside "DATASET_PATH"
+- **DB_NAME**: a database that is used to store the pid documetns and the xml result of the graph construction.
+- **MONGO_URI**: An uri for connection to the database.
+- **PID_UPLOAD_PATH**: A path where documents are uploaded.
+- **AZURE_DI_ENDPOINT**: azure document inteligence endpoint required for OCR detection.
+- **AZURE_DI_KEY**: A key associated with the provided endpoint for OCR detection.
+- **MODEL_FILE_ID**: A key associated with the provided endpoint for OCR detection.
+- **SERVICE_ACCOUNT_KEY_PATH**: A key associated with the provided endpoint for OCR detection.
 
 #### Other files
 Some other files have been designed to test the service features either independently or in combination to validate their successfull working.
@@ -46,9 +55,12 @@ Some other files have been designed to test the service features either independ
 - **line_detection_test**: checks if line segments are being detect from the pid image. 
 
 
+For the digitalization of diagrams, the sourcecode depends on identifying the symbols via a model that can be download from google drive which requires a secret in a json format alongside with fileid. for access to the model please contact the **author** of this repo.
+
 #### Future Tasks
-- Features to be built around a FastAPI model which will make testing different parts of the application easier. This will allow easier integration with other systems that want to use these features as plugin modules.
-- The PID documents do not have any graph annotations, which means they need to be created. Create graph annotations to test if the annotation created by your program is accurate, eventhough the graph that is created is not created through an ML model.
+- Features to be built around FastAPI which will make testing easier.✅
+- Implement the functionality of downloading yolo model from google drive. usage of credentials and token is required to achive this task. ✅
+- Merge the verticle or horizontal lines that are intersecting with each other. ✅
 
 <br>
 

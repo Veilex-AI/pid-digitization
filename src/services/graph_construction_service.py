@@ -1,19 +1,17 @@
+from collections import deque
 import networkx as nx
 from networkx import Graph
 
-from src.enums.graph_node_type import GraphNodeType
-from src.models.bounding_box import BoundingBox
-from src.models.symbol import Symbol
-
-from src.utils.bounding_box_to_polygon import bounding_box_to_polygon
-
+from src.exceptions import EmptyLineOrSymbolError
+from src.enums import GraphNodeType
+from src.models import BoundingBox, Symbol
+from src.utils import bounding_box_to_polygon
 
 class GraphConstructionService:
     """
         A graph service responsible for graph management.
-        Utalized to create, modify, prune the graph alongside other functionalities.
+        Utilized to create, modify, prune the graph alongside other functionalities.
     """
-
     graph: Graph = None
     symbols: list[Symbol] = []
     line_segments: list[BoundingBox] = []
@@ -33,7 +31,7 @@ class GraphConstructionService:
         graph = nx.Graph()
 
         if(len(self.line_segments) == 0 or len(self.symbols) == 0):
-            raise Exception("no symbols or line segments are defined.")
+            raise EmptyLineOrSymbolError()
         
         for line in self.line_segments:
             node_id = line.name
@@ -62,7 +60,6 @@ class GraphConstructionService:
 
         return [sorted(list(cycle)) for cycle in unique_cycles]
 
-
     def define_graph_edges(self):
         intersections = self.get_node_intersections()
 
@@ -72,29 +69,23 @@ class GraphConstructionService:
 
         self.graph = self.graph.to_undirected()
 
-    
     def reduce_line_cycles(self):
         """
             Remove all redundent line cycles.
         """
-        for degree in [4, 3]:
-            line_cycles = self.get_line_cycle_list(degree=degree)
+        line_cycles = self.find_3degree_cycles()
 
-            for index, cycle in enumerate(line_cycles):
-                node_id = f"p-{index}"
-                self.graph.add_node(node_id, type=GraphNodeType.connector)
-                
-                # Connect the new node P to all nodes in the cycle
-                for node in cycle:
-                    self.graph.add_edge(node_id, node)
-                
-                # Remove the edges forming the cycle
-                # for i in range(len(cycle)):
-                #     if self.graph.has_edge(cycle[i], cycle[(i + 1) % len(cycle)]):
-                #         self.graph.remove_edge(cycle[i], cycle[(i + 1) % len(cycle)])
+        for index, cycle in enumerate(line_cycles):
+            node_id = f"p-{index}"
+            self.graph.add_node(node_id, type=GraphNodeType.connector)
+            
+            # Connect the new node P to all nodes in the cycle
+            for node in cycle:
+                self.graph.add_edge(node_id, node)
 
-                self.graph.remove_edges_from([(u,v) for u in cycle for v in cycle if u != v])
+            self.graph.remove_edges_from([(u,v) for u in cycle for v in cycle if u != v])
 
+    # Don't use this function, this is buggy.
     def remove_unnecessary_lines(self):
         """
             buggy code.
@@ -120,8 +111,8 @@ class GraphConstructionService:
             if self.graph.nodes[v].get('type') == GraphNodeType.line and len(list(self.graph.neighbors(v))) == 1:
                 self.graph.remove_node(v)
 
-    def remove_single_connection_line_nodes(self):
-        single_connection_nodes = [node for node, degree in self.graph.degree() if degree == 1 and self.graph.nodes[node]['type'] == GraphNodeType.line]
+    def remove_zero_or_single_connection_line_nodes(self):
+        single_connection_nodes = [node for node, degree in self.graph.degree() if (degree == 1 or degree == 0) and self.graph.nodes[node]['type'] == GraphNodeType.line]
         self.graph.remove_nodes_from(single_connection_nodes)
     
     def get_node_intersections(self) -> dict[str, list[str]]:
@@ -153,7 +144,10 @@ class GraphConstructionService:
         self.graph = self.graph.subgraph(largest_component).copy()
     
     def line_node_to_edges(self):
-        # get all the symbol nodes
+        """
+            any extra line nodes that are not required are removed from the graph.
+            this function has a huge time complexity and thus is slow for large nodes.
+        """
         symbol_and_connector_nodes = [node for node, data in self.graph.nodes(data=True) if data['type'] in [GraphNodeType.connector, GraphNodeType.symbol]]
         node_to_node_paths = []
         for u in symbol_and_connector_nodes:
@@ -182,6 +176,23 @@ class GraphConstructionService:
             for node in path[2:len(path) - 1]:
                 if self.graph.has_node(node): self.graph.remove_node(node)
 
+    def find_3degree_cycles(self):
+        """
+        Return a set of triangles (as sorted 3-tuples) in the undirected graph G.
+        """
+        G = self.graph
+        triangles = set()
+        for u in G:
+            for v in G[u]:
+                if u < v:
+                    # Intersection of neighbors gives candidates for forming a triangle
+                    common_neighbors = set(G[u]).intersection(G[v])
+                    for w in common_neighbors:
+                        # Ensure each triangle is added once by enforcing an ordering
+                        if v < w:
+                            triangles.add((u, v, w))
+        return triangles
+
     def generate_graphml(self) -> str:
         graph_copy = self.graph.copy()
         for node in self.graph.nodes():
@@ -195,7 +206,86 @@ class GraphConstructionService:
         
         return '\n'.join(nx.generate_graphml(graph_copy))
 
-    # PRIVATE FUNCTION
+    def find_valid_paths(self):
+        G = self.graph
+        node_types = nx.get_node_attributes(G, 'type')
+        non_line_nodes = [n for n, t in node_types.items() if t in (GraphNodeType.symbol, GraphNodeType.connector)]
+        valid_paths = []    
+        
+        for start in non_line_nodes:
+            queue = deque()
+            queue.append((start, [start], 0))
+            while queue:
+                current, path, line_count = queue.popleft()
+                
+                for neighbor in G.neighbors(current):
+                    if neighbor in path:
+                        continue
+                    
+                    # Default to line if not specified
+                    neighbor_type = node_types.get(neighbor, GraphNodeType.line)  
+                    if neighbor_type == GraphNodeType.line:
+                        new_path = path + [neighbor]
+                        new_line_count = line_count + 1
+                        queue.append((neighbor, new_path, new_line_count))
+                    else:
+                        if line_count >= 2 and neighbor != start:
+                            valid_path = path + [neighbor]
+                            valid_paths.append(valid_path)
+
+        unique_paths_set = set()
+        unique_paths_arr = []
+
+        for row in valid_paths:
+            pair = frozenset([row[0], row[-1]])
+
+            if pair not in unique_paths_set:
+                unique_paths_set.add(pair)
+                unique_paths_arr.append(row)
+
+        return unique_paths_arr
+
+    def prune_multiple_path_nodes(self, paths):
+        G = self.graph
+        nodes_to_remove = set()
+        remaining_nodes_set = set()
+
+        for path in paths:
+            if(len(path) <= 2):
+                continue
+            to_remove_nodes = []
+            remaining_nodes = []
+
+            for i in range(1, len(path) - 1):
+                node = path[i]
+                if(len(G[node]) > 2):
+                    remaining_nodes.append(node)
+                else:
+                    to_remove_nodes.append(node)
+
+            if(len(remaining_nodes) == 0):
+                remaining_nodes.append(to_remove_nodes.pop())
+
+            nodes_to_remove.update(to_remove_nodes)
+            remaining_nodes_set.update(remaining_nodes)
+
+        for node in nodes_to_remove:
+            if node not in remaining_nodes_set:
+                neighbors = list(G.neighbors(node))
+                if len(neighbors) == 2:
+                    G.add_edge(neighbors[0], neighbors[1])
+                G.remove_node(node)
+
+    def remove_connected_line_nodes(self):
+        """
+            delete node connection whose all nodes are of type line.
+        """
+        connections = list(nx.connected_components(self.graph))
+        for connection in connections:
+            if all([True if self.graph.nodes[item]['type'] == GraphNodeType.line else False for item in list(connection)]):
+                self.graph.remove_nodes_from(connection)
+
+    # PRIVATE FUNCTIONS
     def uniqify_paths(self, G, paths):
         unique_paths = []
         seen = []

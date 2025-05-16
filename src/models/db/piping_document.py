@@ -1,6 +1,7 @@
 from beanie import Document
 from datetime import datetime
 from typing import List, Optional
+
 from src.models.bounding_box import BoundingBox
 from src.models.line import Line
 from src.models.symbol import Symbol

@@ -1,9 +1,9 @@
 from typing import List
 from pydantic import BaseModel
-from src.enums.annotation_type import AnnotationType
-from src.models.line import Line
-from src.models.symbol import Symbol
-from src.models.bounding_box import BoundingBox
+from src.enums import AnnotationType
+from .line import Line
+from .symbol import Symbol
+from .bounding_box import BoundingBox
 
 class PidDataPoint(BaseModel):
     symbols: List[Symbol] = []

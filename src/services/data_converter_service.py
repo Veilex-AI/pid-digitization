@@ -1,12 +1,10 @@
-from src.enums.annotation_type import AnnotationType
-from src.models.pid_data_point import PidDataPoint
-from src.utils.convert_raw_data_to_symbols import convert_raw_data_to_symbols
-from src.utils.convert_raw_data_to_lines import convert_raw_data_to_lines
-from src.utils.convert_raw_data_to_bounding_box import convert_raw_data_to_bounding_box
-
 import os
 from typing import List
 import numpy as np
+
+from src.enums import AnnotationType
+from src.models import PidDataPoint
+from src.utils import convert_raw_data_to_symbols, convert_raw_data_to_lines, convert_raw_data_to_bounding_box
 from config import config
 
 class DataConverterService:

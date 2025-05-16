@@ -1,11 +1,14 @@
+from collections import defaultdict
 import math
-from typing import List
 import cv2
 import numpy as np
+from shapely import LineString, Polygon
 from shapely.geometry import Point
-from src.models.bounding_box import BoundingBox
-from src.utils.get_slope_between_points import get_slope_between_points
-from src.utils.calculate_distance_between_points import calculate_distance_between_points
+from typing import List
+
+from src.models import BoundingBox
+from src.utils import get_slope_between_points, calculate_distance_between_points, bounding_box_to_polygon
+from shapely.ops import linemerge
 
 class LineDetectionService:
     image_path: str = ""
@@ -23,11 +26,7 @@ class LineDetectionService:
         """
             get the image in OpenCV compatible format.
         """
-        # kind of deprecated piece of code. this is not required now.
-        # if not self.image_path:
-        #     return cv2.cvtColor(np.array(self.image_pil), cv2.COLOR_RGB2BGR)
         return cv2.imread(self.image_path)
-        
 
     def detect_line_segments(self, enable_thining=True):
         preprocessed_image = self.pre_process_image(enable_thining)
@@ -41,7 +40,6 @@ class LineDetectionService:
 
         return [ ls[0] for ls in line_segments ]
         
-    
     def pre_process_image(self, enable_thining=False):
         """
             pre process the image before the lines can be detected. makes the image black and white by removing the RGB vlaues.
@@ -145,6 +143,32 @@ class LineDetectionService:
 
         return extended_line_segments
     
+    def merge_lines(self, line_segments = []):
+        """
+            Merge the lines if they intersect, have the same slope, and are adjacent.
+        """
+        connected_components = self.find_intersections_to_merge(
+            self.find_merge_intersections(line_segments)
+        )
+
+        merged_polygons = []
+        for connect_indexs in connected_components:
+            x, y, _x, _y = line_segments[connect_indexs[0]]
+            polygon = bounding_box_to_polygon(x, y, _x, _y)
+            for con_index in connect_indexs[1:]:
+                x, y, _x, _y = line_segments[con_index]
+                new_polygon = bounding_box_to_polygon(x, y, _x, _y)
+                polygon = polygon.union(new_polygon)
+            polygon = polygon.envelope
+            merged_polygons.append(polygon.bounds)
+
+        index_to_delete = []
+        for connect in connected_components:
+            for c in connect:
+                index_to_delete.append(c)
+
+        return [*[item for i, item in enumerate(line_segments) if i not in index_to_delete], *merged_polygons]
+
     def get_line_padding(self, startX, startY, endX, endY, multiplier = 2):
         """
             increase the padding with a multiplier if the line is too short.
@@ -153,3 +177,60 @@ class LineDetectionService:
         if distance < 40:
             return self.line_padding * multiplier
         return self.line_padding
+
+    def find_merge_intersections(self, line_segments = []):
+        """
+            see which lines can be merged a.
+        """
+        merged_intersections = []
+        i = 0
+        while i < len(line_segments):
+            j = i + 1
+            while j < len(line_segments):
+                x1, y1, _x1, _y1 = line_segments[i]
+                x2, y2, _x2, _y2 = line_segments[j]
+                current_line = bounding_box_to_polygon(x1, y1, _x1, _y1)
+                next_line = bounding_box_to_polygon(x2, y2, _x2, _y2)
+
+                def thick_line_slope(x1, y1, x2, y2):
+                    width = abs(x2 - x1)
+                    height = abs(y2 - y1)
+                    return 0 if width > height else float('inf')
+
+                if current_line.intersects(next_line) and thick_line_slope(x1, y1, _x1, _y1) == thick_line_slope(x2, y2, _x2, _y2):
+                    merged_intersections.append((i, j))
+                j += 1
+            i += 1
+
+        return merged_intersections
+    
+    def find_intersections_to_merge(self, merged_lines_index):
+        intersections = merged_lines_index
+
+        adj_list = defaultdict(set)
+        for a, b in intersections:
+            adj_list[a].add(b)
+            adj_list[b].add(a)
+
+        def find_connected_components(adj_list):
+            visited = set()
+            components = []
+
+            def dfs(node, component):
+                stack = [node]
+                while stack:
+                    curr = stack.pop()
+                    if curr not in visited:
+                        visited.add(curr)
+                        component.append(curr)
+                        stack.extend(adj_list[curr] - visited)
+
+            for node in adj_list:
+                if node not in visited:
+                    component = []
+                    dfs(node, component)
+                    components.append(sorted(component))  # Sort for consistency
+
+            return components
+
+        return find_connected_components(adj_list)
