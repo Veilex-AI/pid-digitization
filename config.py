@@ -13,6 +13,8 @@ class Settings(BaseSettings):
         param pid_upload_path: the dir where all pid documents will be uploaded via the API.
         param azure_di_endpoint: url endpoint for azure document inteligence service
         param azure_di_key: associaated key to access azure document inteliggence service
+        param model_file_id: file id that references the file in the cloud
+        param service_account_key_path: service account key for permission to download the file
     """
     model_path: str
     upload_path: str
@@ -24,6 +26,8 @@ class Settings(BaseSettings):
     pid_upload_path: str
     azure_di_endpoint: str
     azure_di_key: str
+    model_file_id: str
+    service_account_key_path: str
 
     model_config = SettingsConfigDict(
         env_file=".env",
