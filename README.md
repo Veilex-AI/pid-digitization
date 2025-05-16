@@ -44,6 +44,8 @@ The config file consists of the following key-value pairs.
 - **PID_UPLOAD_PATH**: A path where documents are uploaded.
 - **AZURE_DI_ENDPOINT**: azure document inteligence endpoint required for OCR detection.
 - **AZURE_DI_KEY**: A key associated with the provided endpoint for OCR detection.
+- **MODEL_FILE_ID**: A key associated with the provided endpoint for OCR detection.
+- **SERVICE_ACCOUNT_KEY_PATH**: A key associated with the provided endpoint for OCR detection.
 
 #### Other files
 Some other files have been designed to test the service features either independently or in combination to validate their successfull working.
@@ -52,6 +54,8 @@ Some other files have been designed to test the service features either independ
 - **graph_construction**: test graph construction service test graph functions to check if the provided result can be converted into a minimilistic graph with fewest redundencies.
 - **line_detection_test**: checks if line segments are being detect from the pid image. 
 
+
+For the digitalization of diagrams, the sourcecode depends on identifying the symbols via a model that can be download from google drive which requires a secret in a json format alongside with fileid. for access to the model please contact the **author** of this repo.
 
 #### Future Tasks
 - Features to be built around FastAPI which will make testing easier.✅
