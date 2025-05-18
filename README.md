@@ -1,11 +1,13 @@
 ### Overview
 This is a repository for managing the workflow of digitizing piping and instrumentation diagrams. Its primary function is to take an image and convert it into a XML graph data structure in machine readable format.
+The platform uses nvcc version 12.4
 
 #### How to execute the code.
 - prefered version of python is **3.12.8**
 - create a virtual environment: **python3 -m venv env**
 - activate the virtual environment: **.\env\Scripts\activate**
 - install all the packages from requirements.txt into the environment: **pip install -r requirements.txt**
+- execute the main.py file **python main.py**
 
 alternatively you could you also create a docker container to run the fast api service for testing the graph creation service.
 
