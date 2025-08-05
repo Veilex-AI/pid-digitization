@@ -3,8 +3,9 @@ import os
 import io
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseDownload
+from config import config
 
-model_file_name = "yolo-model-pid.pt"
+model_file_name = config.model_path
 
 def download_file_with_service_account(file_id: int, service_account_file: str):
     if os.path.exists(f'./{model_file_name}'):

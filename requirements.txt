@@ -14,7 +14,6 @@ fastapi==0.115.6
 lazy-model==0.2.0
 motor==3.6.0
 pillow==11.1.0
-pydantic==2.10.4
 pydantic_core==2.27.2
 pymongo==4.9.2
 typing_extensions==4.12.2
@@ -26,3 +25,7 @@ azure-cognitiveservices-vision-computervision==0.9.1
 azure-common==1.1.28
 azure-core==1.32.0
 azure-storage-blob==12.24.1
+fastapi==0.115.6
+uvicorn==0.34.0
+google-api-python-client==2.177.0
+google-auth-oauthlib==1.2.2

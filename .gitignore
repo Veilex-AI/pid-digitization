@@ -172,3 +172,9 @@ cython_debug/
 
 # others 
 ./pyvenv.cfg
+
+
+**/DigitizePID_Dataset
+**/best.pt
+**/last.pt
+**/uploads/**

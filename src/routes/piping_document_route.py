@@ -105,7 +105,7 @@ async def digitize_pid_document(id: str):
     image_path = f"{config.pid_upload_path}/{pid_document.image_name}"
 
     # get all symbols from the document.
-    model_path="./yolo-model-pid.pt"
+    model_path=config.model_path
     predict_symbol_service = PredictSymbolsService(
         image_path=image_path,
         model_path=model_path
