@@ -15,8 +15,8 @@ The source code of this repo is broken down into multiple folders.
 - **services**: provides main logical functionalities as features, such as data conversion, symbol prediction, graph creation
 - **utils**: provides basic functions that are reused throughout different part of services.
 
-##### If you want to know on how to train the PID dataset for symbol detection please refer to the notion link below. 
-https://www.notion.so/Thesis-Extracting-Semantic-Relationship-from-visual-diagrams-14c2e0d11f918084b3b7c3d5f4b58c93 
+##### If you want to know on how to train the PID dataset for symbol detection please refer to the link below. 
+[Training Instructions](TRAINING.md)
 
 <br>
 
