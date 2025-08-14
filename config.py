@@ -26,8 +26,8 @@ class Settings(BaseSettings):
     pid_upload_path: str
     azure_di_endpoint: str
     azure_di_key: str
-    model_file_id: str
-    service_account_key_path: str
+    model_file_id: str = ""
+    service_account_key_path: str = ""
 
     model_config = SettingsConfigDict(
         env_file=".env",

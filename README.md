@@ -43,9 +43,11 @@ The config file consists of the following key-value pairs.
 - **MONGO_URI**: An uri for connection to the database.
 - **PID_UPLOAD_PATH**: A path where documents are uploaded.
 - **AZURE_DI_ENDPOINT**: azure document inteligence endpoint required for OCR detection.
-- **AZURE_DI_KEY**: A key associated with the provided endpoint for OCR detection.
-- **MODEL_FILE_ID**: A key associated with the provided endpoint for OCR detection.
-- **SERVICE_ACCOUNT_KEY_PATH**: A key associated with the provided endpoint for OCR detection.
+- **AZURE_DI_KEY**: associaated key to access azure document inteliggence service.
+- **MODEL_FILE_ID**: file id that references the file in the cloud.
+- **SERVICE_ACCOUNT_KEY_PATH**: Google service account key for permission to download the file.
+
+Alternatively you could request the PID detection model from the author and add it in the root folder instead of providing **MODEL_FILE_ID** & **SERVICE_ACCOUNT_KEY_PATH** 
 
 #### Other files
 Some other files have been designed to test the service features either independently or in combination to validate their successfull working.
@@ -57,12 +59,7 @@ Some other files have been designed to test the service features either independ
 
 For the digitalization of diagrams, the sourcecode depends on identifying the symbols via a model that can be download from google drive which requires a secret in a json format alongside with fileid. for access to the model please contact the **author** of this repo.
 
-#### Future Tasks
-- Features to be built around FastAPI which will make testing easier.✅
-- Implement the functionality of downloading yolo model from google drive. usage of credentials and token is required to achive this task. ✅
-- Merge the verticle or horizontal lines that are intersecting with each other. ✅
-
 <br>
 
-The repo is primarily designed around a "piping and instrumentation diagram" dataset that is taken from the following link
+The "pipping and instrumentation diagram" model has been trained on dataset that is taken from the following link
 https://drive.google.com/drive/u/0/folders/1gMm_YKBZtXB3qUKUpI-LF1HE_MgzwfeR
