@@ -16,7 +16,7 @@ The source code of this repo is broken down into multiple folders.
 - **utils**: provides basic functions that are reused throughout different part of services.
 
 ##### If you want to know on how to train the PID dataset for symbol detection please refer to the link below. 
-[Training Instructions](TRAINING.md)
+[Training Instructions](TRAINING_MODEL.md)
 
 <br>
 
