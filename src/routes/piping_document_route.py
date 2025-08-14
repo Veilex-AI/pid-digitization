@@ -1,6 +1,7 @@
 import asyncio
 from datetime import datetime
 import io
+import os
 from typing import List
 from uuid import uuid4
 from fastapi import APIRouter, File, HTTPException, UploadFile
@@ -52,6 +53,7 @@ async def upload_pid(
 
     # upload the file 
     image = Image.open(io.BytesIO(await file.read())).convert("RGB")
+    os.makedirs(f"./{config.pid_upload_path}", exist_ok=True)
     image.save(f"{config.pid_upload_path}/{new_file_name}")
 
     # save it to the databse
